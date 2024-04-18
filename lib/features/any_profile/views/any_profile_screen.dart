@@ -15,7 +15,7 @@ class AnyProfileScreen extends StatefulWidget {
 
 class _AnyProfileScreenState extends State<AnyProfileScreen> {
   late Future<Map<String, dynamic>> _profileData;
-
+  late String _role = "";
   @override
   void initState() {
     super.initState();
@@ -25,17 +25,23 @@ class _AnyProfileScreenState extends State<AnyProfileScreen> {
   Future<Map<String, dynamic>> _fetchProfileData() async {
     try {
       String? token = await TokenManager.getToken();
+      String? role = await TokenManager.getRole();
+      if(role == 'trainer') {
+        _role = 'student';
+      } else if(role== 'student') {
+        _role = 'trainer';
+      }
       if (token == null) {
         return {};
       }
-      var url = Uri.parse('http://192.168.0.106:4000/api/student/get/${widget.profileId}');
+      var url = Uri.parse('http://192.168.0.106:4000/api/$_role/get/${widget.profileId}');
       var response = await http.post(
         url,
         headers: {'authorization': '$token'},
       );
       var data = json.decode(response.body);
       print("Received profile data: $data");
-      return data['student'];
+      return data['$_role'];
     } catch (error) {
       print("Error fetching profile data: $error");
       return {}; // Возвращаем пустой Map в случае ошибки

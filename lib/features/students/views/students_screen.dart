@@ -1,3 +1,4 @@
+import 'package:app2/features/chat/views/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -150,8 +151,58 @@ class _StudentScreenState extends State<StudentScreen> {
               children: [
                 IconButton(
                   icon: Icon(Icons.chat),
-                  onPressed: () {
-                    // Action when chat icon is pressed
+                  onPressed: () async {
+                    try {
+                      String? token = await TokenManager.getToken();
+
+                      // Получаем trainerId
+                      var trainerResponse = await http.post(
+                        Uri.parse('http://192.168.0.106:4000/api/trainer/get'),
+                        headers: {'authorization': '$token'},
+                      );
+                      var trainerData = json.decode(trainerResponse.body);
+                      if (!trainerData['success']) {
+                        throw Exception('Failed to get trainer data');
+                      }
+                      print(trainerData);
+                      String? trainerId = trainerData['trainer']['_id'];
+                      print(trainerId);
+                      // Отправляем запрос на создание чата
+                      print(_students[index]['_id']);
+
+                      var createChatResponse = await http.post(
+                        Uri.parse('http://192.168.0.106:4000/api/chat/create'),
+                        headers: {'authorization': '$token', 'Content-Type': 'application/json'},
+                        body: json.encode({
+                          'studentId': _students[index]['_id'],
+                          'trainerId': trainerId,
+                        }),
+                      );
+                      var createChatData = json.decode(createChatResponse.body);
+                        print(createChatData);
+                      if (createChatData['success']) {
+                        // Обработка успешного создания чата
+                        // Например, перенаправление на экран чата
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChatScreen(chatId: createChatData['chat']['_id'], studentId: _students[index]['_id']),
+                          ),
+                        );
+                      } else {
+                        // Обработка ошибки создания чата
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(createChatData['message']),
+                          backgroundColor: Colors.red,
+                        ));
+                      }
+                    } catch (error) {
+                      // Обработка ошибки
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text('Failed to create chat: $error'),
+                        backgroundColor: Colors.red,
+                      ));
+                    }
                   },
                 ),
                 IconButton(
