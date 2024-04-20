@@ -1,3 +1,4 @@
+import 'package:app2/features/gallery/views/gallery_screen.dart';
 import 'package:app2/features/profile/views/edit_profile_screen.dart';
 import 'package:app2/features/profile/views/profile_screen.dart';
 import 'package:app2/features/requests/views/requests_screen.dart';
@@ -15,5 +16,6 @@ final routes = {
   '/profile/edit': (context) => EditProfileScreen(),
   '/students' : (context) => StudentScreen(),
   '/requests': (context) => RequestsScreen(),
-  '/trainers': (context) => TrainerInputScreen()
+  '/trainers': (context) => TrainerInputScreen(),
+  '/gallery' : (context) => GalleryScreen()
 };

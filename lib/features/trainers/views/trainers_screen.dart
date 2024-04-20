@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../../token_manager.dart';
+import 'package:app2/features/chat/views/chat_screen.dart'; // Импорт ChatScreen
 
 class Trainer {
   final String id; // Добавляем поле id
@@ -211,8 +212,66 @@ class _TrainerInputScreenState extends State<TrainerInputScreen> {
                             ),
                             IconButton(
                               icon: Icon(Icons.chat),
-                              onPressed: () {
-                                // Действие по отправке сообщения в чат
+                              onPressed: () async {
+                                try {
+                                  String? token = await TokenManager.getToken();
+
+                                  // Отправляем запрос на получение studentId
+                                  var studentResponse = await http.post(
+                                    Uri.parse('http://192.168.0.106:4000/api/student/get'),
+                                    headers: {'authorization': '$token'},
+                                  );
+                                  var studentData = json.decode(studentResponse.body);
+                                  if (!studentData['success']) {
+                                    throw Exception('Failed to get student data');
+                                  }
+                                  print(studentData);
+                                  String? studentId = studentData['student']['_id'];
+                                  print(studentId);
+
+                                  // Проверяем, что studentId не равно null
+                                  if (studentId != null) {
+                                    // Отправляем запрос на создание чата
+                                    var createChatResponse = await http.post(
+                                      Uri.parse('http://192.168.0.106:4000/api/chat/create'),
+                                      headers: {'authorization': '$token', 'Content-Type': 'application/json'},
+                                      body: json.encode({
+                                        'studentId': studentId,
+                                        'trainerId': trainer.id,
+                                      }),
+                                    );
+                                    var createChatData = json.decode(createChatResponse.body);
+                                    print(createChatData);
+                                    if (createChatData['success']) {
+                                      // Обработка успешного создания чата
+                                      // Например, перенаправление на экран чата
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ChatScreen(chatId: createChatData['chat']['_id'], companionId: trainer.id),
+                                        ),
+                                      );
+                                    } else {
+                                      // Обработка ошибки создания чата
+                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                        content: Text(createChatData['message']),
+                                        backgroundColor: Colors.red,
+                                      ));
+                                    }
+                                  } else {
+                                    // studentId равен null, обработка этого случая
+                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                      content: Text('Failed to get student ID'),
+                                      backgroundColor: Colors.red,
+                                    ));
+                                  }
+                                } catch (error) {
+                                  // Обработка ошибки
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                    content: Text('Failed to create chat: $error'),
+                                    backgroundColor: Colors.red,
+                                  ));
+                                }
                               },
                             ),
                           ],

@@ -186,7 +186,7 @@ class _StudentScreenState extends State<StudentScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ChatScreen(chatId: createChatData['chat']['_id'], studentId: _students[index]['_id']),
+                            builder: (context) => ChatScreen(chatId: createChatData['chat']['_id'], companionId: _students[index]['_id']),
                           ),
                         );
                       } else {

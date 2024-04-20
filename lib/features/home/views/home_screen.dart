@@ -58,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
         break;
       case 2:
-        Navigator.pushNamed(context, _role == 'student' ? '/workouts' : '/galery');
+        Navigator.pushNamed(context, _role == 'student' ? '/workouts' : '/gallery');
         break;
       case 3:
         Navigator.pushNamed(context, '/profile'); // Переход на экран профиля
