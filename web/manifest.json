@@ -1,11 +1,11 @@
 {
-    "name": "app2",
-    "short_name": "app2",
+    "name": "training_sync",
+    "short_name": "training_sync",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "train sync app",
+    "description": "A new Flutter project.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

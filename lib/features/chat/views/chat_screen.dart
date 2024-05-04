@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import '../../../token_manager.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ChatScreen extends StatefulWidget {
   final String chatId;
@@ -29,7 +31,7 @@ class _ChatScreenState extends State<ChatScreen> {
         TextEditingController(); // Инициализируем контроллер сообщений
 
     // Подключение к серверу
-    socket = IO.io('http://192.168.0.106:4000', <String, dynamic>{
+    socket = IO.io('http://192.168.0.105:4000', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
     });
@@ -57,7 +59,22 @@ class _ChatScreenState extends State<ChatScreen> {
     // Получение сообщений чата
     _fetchChatMessages();
   }
+  // Метод для прослушивания новых сообщений
+  void _listenToNewMessages() {
+    socket.on('message', (data) {
+      ChatMessage newMessage = ChatMessage.fromJson(data);
 
+      // Проверяем, пришло ли новое сообщение от текущего собеседника
+      if (newMessage.senderId == _companionData['_id'] || newMessage.senderId == _senderId) {
+
+        // Обновляем список сообщений и прокручиваем к последнему
+        setState(() {
+          _messages.add(newMessage);
+        });
+        _scrollToBottom();
+      }
+    });
+  }
   // Метод для получения идентификатора отправителя
   Future<void> _getSenderId() async {
     String? token = await TokenManager.getToken();
@@ -65,7 +82,7 @@ class _ChatScreenState extends State<ChatScreen> {
       return;
     }
     String? role = await TokenManager.getRole();
-    var url = Uri.parse('http://192.168.0.106:4000/api/$role/get');
+    var url = Uri.parse('http://192.168.0.105:4000/api/$role/get');
     var response = await http.post(
       url,
       headers: {'authorization': '$token'},
@@ -96,7 +113,7 @@ class _ChatScreenState extends State<ChatScreen> {
       role = "trainer";
     }
     var url = Uri.parse(
-        'http://192.168.0.106:4000/api/$role/get/${widget.companionId}');
+        'http://192.168.0.105:4000/api/$role/get/${widget.companionId}');
     var response = await http.post(
       url,
       headers: {'authorization': '$token'},
@@ -139,7 +156,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _fetchChatMessages() async {
     try {
       String? token = await TokenManager.getToken();
-      var url = Uri.parse('http://192.168.0.106:4000/api/chat/messages');
+      var url = Uri.parse('http://192.168.0.105:4000/api/chat/messages');
       var response = await http.post(
         url,
         headers: {
@@ -336,7 +353,7 @@ class _ChatBodyState extends State<ChatBody> {
                 child: TextField(
                   controller: widget.messageController,
                   decoration: InputDecoration(
-                    hintText: 'Введите сообщение...',
+                    hintText: '${AppLocalizations.of(context)!.enter_message}...',
                   ),
                 ),
               ),
@@ -363,29 +380,29 @@ class _ChatBodyState extends State<ChatBody> {
   String _getMonthName(int month) {
     switch (month) {
       case 1:
-        return 'января';
+        return AppLocalizations.of(context)!.january;
       case 2:
-        return 'февраля';
+        return AppLocalizations.of(context)!.february;
       case 3:
-        return 'марта';
+        return AppLocalizations.of(context)!.march;
       case 4:
-        return 'апреля';
+        return AppLocalizations.of(context)!.april;
       case 5:
-        return 'мая';
+        return AppLocalizations.of(context)!.may;
       case 6:
-        return 'июня';
+        return AppLocalizations.of(context)!.june;
       case 7:
-        return 'июля';
+        return AppLocalizations.of(context)!.july;
       case 8:
-        return 'августа';
+        return AppLocalizations.of(context)!.august;
       case 9:
-        return 'сентября';
+        return AppLocalizations.of(context)!.september;
       case 10:
-        return 'октября';
+        return AppLocalizations.of(context)!.october;
       case 11:
-        return 'ноября';
+        return AppLocalizations.of(context)!.november;
       case 12:
-        return 'декабря';
+        return AppLocalizations.of(context)!.december;
       default:
         return '';
     }

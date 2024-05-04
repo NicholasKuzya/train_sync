@@ -4,6 +4,8 @@ import 'dart:convert';
 import '../../../token_manager.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart' as picker;
 import 'package:intl/intl.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({Key? key}) : super(key: key);
@@ -47,7 +49,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     });
 
     if (_role != null && _role!.isNotEmpty) {
-      var url = Uri.parse('http://192.168.0.106:4000/api/$_role/get');
+      var url = Uri.parse('http://192.168.0.105:4000/api/$_role/get');
       var response = await http.post(
         url,
         headers: {'authorization': '$token'},
@@ -84,7 +86,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Редактирование профиля'),
+        title: Text(AppLocalizations.of(context)!.title_edit_profile),
         actions: [
           IconButton(
             icon: Icon(Icons.save),
@@ -104,23 +106,23 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             children: [
               TextField(
                 controller: _fullNameController,
-                decoration: InputDecoration(labelText: 'Полное имя'),
+                decoration: InputDecoration(labelText: AppLocalizations.of(context)!.fullName),
               ),
               TextField(
                 controller: _countryController,
-                decoration: InputDecoration(labelText: 'Страна'),
+                decoration: InputDecoration(labelText: AppLocalizations.of(context)!.country),
               ),
               TextField(
                 controller: _cityController,
-                decoration: InputDecoration(labelText: 'Город'),
+                decoration: InputDecoration(labelText: AppLocalizations.of(context)!.city),
               ),
               TextField(
                 controller: _districtController,
-                decoration: InputDecoration(labelText: 'Район'),
+                decoration: InputDecoration(labelText: AppLocalizations.of(context)!.district),
               ),
               TextField(
                 controller: _genderController,
-                decoration: InputDecoration(labelText: 'Пол'),
+                decoration: InputDecoration(labelText: AppLocalizations.of(context)!.gender),
               ),
               GestureDetector(
                 onTap: () {
@@ -139,45 +141,45 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 child: AbsorbPointer(
                   child: TextField(
                     controller: _birthDateController,
-                    decoration: InputDecoration(labelText: 'Дата рождения'),
+                    decoration: InputDecoration(labelText: AppLocalizations.of(context)!.dateOfBirth),
                   ),
                 ),
               ),
               if (_role == "student") ...[
                 TextField(
                   controller: _weightController,
-                  decoration: InputDecoration(labelText: 'Вес'),
+                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.weight),
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                 ),
                 TextField(
                   controller: _heightController,
-                  decoration: InputDecoration(labelText: 'Рост'),
+                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.height),
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                 ),
                 TextField(
                   controller: _goalController,
-                  decoration: InputDecoration(labelText: 'Цель'),
+                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.goal),
                   maxLines: 5,
                 ),
               ],
               if (_role == "trainer") ...[
                 TextField(
                   controller: _aboutController,
-                  decoration: InputDecoration(labelText: 'О себе'),
+                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.profileAbout),
                   maxLines: 5,
                 ),
                 TextField(
                   controller: _achievementsController,
-                  decoration: InputDecoration(labelText: 'Достижения'),
+                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.achiv),
                   maxLines: 5,
                 ),
                 TextField(
                   controller: _gymController,
-                  decoration: InputDecoration(labelText: 'Зал'),
+                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.gym),
                 ),
                 TextField(
                   controller: _specializationController,
-                  decoration: InputDecoration(labelText: 'Специализация'),
+                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.specialization),
                   maxLines: 5,
                 ),
               ],
@@ -191,7 +193,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<void> _saveChanges() async {
     String? token = await TokenManager.getToken();
     if (_role != null && _role!.isNotEmpty) {
-      var url = Uri.parse('http://192.168.0.106:4000/api/$_role/update');
+      var url = Uri.parse('http://192.168.0.105:4000/api/$_role/update');
       Map<String, dynamic> requestBody = {
         "fullName": _fullNameController.text,
         "country": _countryController.text,
@@ -226,7 +228,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (responseBody["success"]) {
         // Показать уведомление об успешном сохранении
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Профиль успешно обновлен'),
+          content: Text(AppLocalizations.of(context)!.editProfileSuccess),
+          duration: Duration(seconds: 2),
+        ));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(AppLocalizations.of(context)!.editProfileUnSuccess),
           duration: Duration(seconds: 2),
         ));
       }

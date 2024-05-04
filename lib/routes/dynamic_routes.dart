@@ -1,7 +1,9 @@
-import 'package:app2/features/chat/views/chat_screen.dart';
-import 'package:app2/features/video_editor/views/video_editor_screen.dart';
+import 'package:training_sync/features/chat/views/chat_screen.dart';
+import 'package:training_sync/features/exercises/views/exercise_screen.dart';
+import 'package:training_sync/features/exercises/views/exercise_set_screen.dart';
+import 'package:training_sync/features/video_editor/views/video_editor_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:app2/features/any_profile/views/any_profile_screen.dart';
+import 'package:training_sync/features/any_profile/views/any_profile_screen.dart';
 
 class DynamicRoutes {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -30,6 +32,24 @@ class DynamicRoutes {
       final videoPath = parts[2];
       return MaterialPageRoute(
         builder: (context) => VideoEditorScreen(videoPath: videoPath),
+      );
+    }
+    if (settings.name!.startsWith('/exercise/')) {
+      // Обработка динамического маршрута для чата
+      // Извлекаем идентификатор чата и студента из пути
+      final parts = settings.name!.split('/');
+      final exerciseId = parts[2];
+      return MaterialPageRoute(
+        builder: (context) => ExerciseScreen(exerciseId: exerciseId),
+      );
+    }
+    if (settings.name!.startsWith('/set/')) {
+      // Обработка динамического маршрута для чата
+      // Извлекаем идентификатор чата и студента из пути
+      final parts = settings.name!.split('/');
+      final setId = parts[2];
+      return MaterialPageRoute(
+        builder: (context) => ExerciseSetScreen(setId: setId),
       );
     }
     // Если маршрут не совпадает с динамическими маршрутами, вы можете вернуть

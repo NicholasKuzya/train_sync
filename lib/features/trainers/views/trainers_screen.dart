@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../../token_manager.dart';
-import 'package:app2/features/chat/views/chat_screen.dart'; // Импорт ChatScreen
+import 'package:training_sync/features/chat/views/chat_screen.dart'; // Импорт ChatScreen
 
 class Trainer {
   final String id; // Добавляем поле id
@@ -41,7 +41,7 @@ class _TrainerInputScreenState extends State<TrainerInputScreen> {
       return;
     }
     final response = await http.get(
-      Uri.parse('http://192.168.0.106:4000/api/trainer/get/all?country=$_selectedCountry&city=$_selectedCity&district=$_selectedDistrict&sortBy=$_selectedSortBy'),
+      Uri.parse('http://192.168.0.105:4000/api/trainer/get/all?country=$_selectedCountry&city=$_selectedCity&district=$_selectedDistrict&sortBy=$_selectedSortBy'),
       headers: {
         'authorization': token,
         'Content-Type': 'application/json'
@@ -79,7 +79,7 @@ class _TrainerInputScreenState extends State<TrainerInputScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.0.106:4000/api/student/training/send-request'),
+        Uri.parse('http://192.168.0.105:4000/api/student/training/send-request'),
         headers: {
           'authorization': token,
           'Content-Type': 'application/json'
@@ -218,7 +218,7 @@ class _TrainerInputScreenState extends State<TrainerInputScreen> {
 
                                   // Отправляем запрос на получение studentId
                                   var studentResponse = await http.post(
-                                    Uri.parse('http://192.168.0.106:4000/api/student/get'),
+                                    Uri.parse('http://192.168.0.105:4000/api/student/get'),
                                     headers: {'authorization': '$token'},
                                   );
                                   var studentData = json.decode(studentResponse.body);
@@ -233,7 +233,7 @@ class _TrainerInputScreenState extends State<TrainerInputScreen> {
                                   if (studentId != null) {
                                     // Отправляем запрос на создание чата
                                     var createChatResponse = await http.post(
-                                      Uri.parse('http://192.168.0.106:4000/api/chat/create'),
+                                      Uri.parse('http://192.168.0.105:4000/api/chat/create'),
                                       headers: {'authorization': '$token', 'Content-Type': 'application/json'},
                                       body: json.encode({
                                         'studentId': studentId,

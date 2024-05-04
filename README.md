@@ -1,6 +1,6 @@
-# app2
+# training_sync
 
-train sync app
+A new Flutter project.
 
 ## Getting Started
 

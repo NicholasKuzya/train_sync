@@ -1,8 +1,10 @@
-import 'package:app2/features/chat/views/chat_screen.dart';
+import 'package:training_sync/features/chat/views/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../../token_manager.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class StudentScreen extends StatefulWidget {
   @override
@@ -23,7 +25,7 @@ class _StudentScreenState extends State<StudentScreen> {
   Future<void> _fetchStudents() async {
     try {
       String? token = await TokenManager.getToken();
-      var url = Uri.parse('http://192.168.0.106:4000/api/trainer/get/students');
+      var url = Uri.parse('http://192.168.0.105:4000/api/trainer/get/students');
       var response = await http.post(
         url,
         headers: {'authorization': '$token'},
@@ -54,7 +56,7 @@ class _StudentScreenState extends State<StudentScreen> {
   Future<void> _fetchRequestsCount() async {
     try {
       String? token = await TokenManager.getToken();
-      var url = Uri.parse('http://192.168.0.106:4000/api/trainer/get/requests');
+      var url = Uri.parse('http://192.168.0.105:4000/api/trainer/get/requests');
       var response = await http.post(
         url,
         headers: {'authorization': '$token'},
@@ -87,7 +89,7 @@ class _StudentScreenState extends State<StudentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Students'),
+        title: Text(AppLocalizations.of(context)!.title_students),
         actions: [
           Stack(
             children: [
@@ -157,7 +159,7 @@ class _StudentScreenState extends State<StudentScreen> {
 
                       // Получаем trainerId
                       var trainerResponse = await http.post(
-                        Uri.parse('http://192.168.0.106:4000/api/trainer/get'),
+                        Uri.parse('http://192.168.0.105:4000/api/trainer/get'),
                         headers: {'authorization': '$token'},
                       );
                       var trainerData = json.decode(trainerResponse.body);
@@ -171,7 +173,7 @@ class _StudentScreenState extends State<StudentScreen> {
                       print(_students[index]['_id']);
 
                       var createChatResponse = await http.post(
-                        Uri.parse('http://192.168.0.106:4000/api/chat/create'),
+                        Uri.parse('http://192.168.0.105:4000/api/chat/create'),
                         headers: {'authorization': '$token', 'Content-Type': 'application/json'},
                         body: json.encode({
                           'studentId': _students[index]['_id'],

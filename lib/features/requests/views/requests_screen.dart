@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../../token_manager.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class RequestsScreen extends StatefulWidget {
   @override
@@ -20,7 +22,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
   Future<void> _fetchRequests() async {
     try {
       String? token = await TokenManager.getToken();
-      var url = Uri.parse('http://192.168.0.106:4000/api/trainer/get/requests');
+      var url = Uri.parse('http://192.168.0.105:4000/api/trainer/get/requests');
       var response = await http.post(
         url,
         headers: {'authorization': '$token'},
@@ -38,7 +40,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
       }
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Ошибка сети. Проверьте подключение к интернету.'),
+        content: Text(AppLocalizations.of(context)!.network_error_check_connection),
         backgroundColor: Colors.red,
       ));
     }
@@ -47,7 +49,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
   Future<void> _acceptOrRejectRequest(String studentId, bool accept) async {
     try {
       String? token = await TokenManager.getToken();
-      var url = Uri.parse('http://192.168.0.106:4000/api/trainer/request/accept');
+      var url = Uri.parse('http://192.168.0.105:4000/api/trainer/request/accept');
       var response = await http.post(
         url,
         headers: {'authorization': '$token', 'Content-Type': 'application/json'},
@@ -56,7 +58,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
       var data = json.decode(response.body);
       if (data['success']) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(accept ? 'Запрос принят' : 'Запрос отклонён'),
+          content: Text(accept ? AppLocalizations.of(context)!.accept_message_true : AppLocalizations.of(context)!.accept_message_false),
           backgroundColor: Colors.green,
         ));
         // Обновляем список запросов после принятия или отклонения
@@ -69,7 +71,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
       }
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Ошибка сети. Проверьте подключение к интернету.'),
+        content: Text(AppLocalizations.of(context)!.network_error_check_connection),
         backgroundColor: Colors.red,
       ));
     }
@@ -79,7 +81,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Запросы'),
+        title: Text(AppLocalizations.of(context)!.title_requests),
       ),
       body: ListView.builder(
         itemCount: _requests.length,
@@ -105,7 +107,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return CircularProgressIndicator();
                     } else if (snapshot.hasError || snapshot.data == null) {
-                      return Text('Ошибка: данные недоступны');
+                      return Text(AppLocalizations.of(context)!.data_loaded_error);
                     } else {
                       Map<String, dynamic>? studentData = snapshot.data as Map<String, dynamic>?;
                       if (studentData != null) {
@@ -130,7 +132,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
                           ],
                         );
                       } else {
-                        return Text('Ошибка: данные не загружены');
+                        return Text(AppLocalizations.of(context)!.data_loaded_error);
                       }
                     }
                   },
@@ -147,7 +149,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
   Widget _buildMessageExpansionTile(String message) {
     return ExpansionTile(
       title: Text(
-        'Сообщение',
+        AppLocalizations.of(context)!.requests_message,
         style: TextStyle(fontWeight: FontWeight.bold),
       ),
       children: [
@@ -165,7 +167,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
   Future<Map<String, dynamic>> _fetchStudentData(String studentId) async {
     try {
       String? token = await TokenManager.getToken();
-      var url = Uri.parse('http://192.168.0.106:4000/api/student/get/$studentId');
+      var url = Uri.parse('http://192.168.0.105:4000/api/student/get/$studentId');
       var response = await http.post(
         url,
         headers: {'authorization': '$token'},
@@ -186,21 +188,21 @@ class _RequestsScreenState extends State<RequestsScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(accept ? 'Принять запрос?' : 'Отклонить запрос?'),
-          content: Text(accept ? 'Вы уверены, что хотите принять этот запрос?' : 'Вы уверены, что хотите отклонить этот запрос?'),
+          title: Text(accept ? AppLocalizations.of(context)!.accept_true : AppLocalizations.of(context)!.accept_false),
+          content: Text(accept ? AppLocalizations.of(context)!.accept_text_true : AppLocalizations.of(context)!.accept_text_false),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Отмена'),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 _acceptOrRejectRequest(studentId, accept);
               },
-              child: Text(accept ? 'Принять' : 'Отклонить'),
+              child: Text(accept ? AppLocalizations.of(context)!.accept_true : AppLocalizations.of(context)!.accept_false),
             ),
           ],
         );

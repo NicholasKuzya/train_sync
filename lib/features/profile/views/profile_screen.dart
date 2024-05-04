@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import '../../../token_manager.dart';
 import 'package:expandable_text/expandable_text.dart';
 import './edit_profile_screen.dart'; // Импортируем экран редактирования профиля
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -14,29 +17,78 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   late Future<Map<String, dynamic>> _profileData;
+  late String _avatarUrl;
+  Future<void> _pickAvatar() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery); // Открываем галерею
+    if (image != null) {
+      // Если пользователь выбрал изображение
+      setState(() {
+        _avatarUrl = image.path; // Обновляем URL аватарки
+      });
 
+      // Отправляем изображение на сервер
+      await _uploadAvatar(image);
+    }
+  }
+  // Метод для отправки изображения на сервер
+  Future<void> _uploadAvatar(XFile imageFile) async {
+    final url = Uri.parse('http://192.168.0.105:4000/api/media/avatar');
+    String? token = await TokenManager.getToken();
+    if(token != null) {
+      final request = http.MultipartRequest('POST', url);
+
+      // Добавляем заголовок авторизации
+      request.headers['authorization'] = token!;
+
+      // Добавляем файл изображения к запросу
+      request.files.add(
+          await http.MultipartFile.fromPath('avatar', imageFile.path));
+
+      // Отправляем запрос и получаем ответ
+      final response = await request.send();
+
+      final jsonResponse = await response.stream.bytesToString();
+      final decodedResponse = json.decode(jsonResponse);
+
+      // Проверяем наличие ключа 'success' в JSON-ответе
+      if (decodedResponse['success'] != null && decodedResponse['success']) {
+        // Если ключ 'success' есть и равен true, выводим сообщение
+        print('Uploaded new image: ${decodedResponse['message']}');
+      } else {
+        // Если ключ 'success' отсутствует или равен false, выводим сообщение об ошибке
+        print('Failed to upload avatar: ${decodedResponse['message']}');
+      }
+    } else {
+      // Обработка ситуации, когда токен отсутствует
+      print('Token is null, unable to upload avatar');
+    }
+  }
   @override
   void initState() {
     super.initState();
     _profileData = _fetchProfileData();
+    _profileData.then((profileData) {
+      setState(() {
+        _avatarUrl = profileData['avatar'] != null ? profileData['avatar']['src'] : '';
+      });
+    });
   }
-
-  Future<Map<String, dynamic>> _fetchProfileData() async {
-    String? token = await TokenManager.getToken();
-    if (token == null) {
-      // Если токен не существует, возвращаем пустой Map
-      return {};
+    Future<Map<String, dynamic>> _fetchProfileData() async {
+      String? token = await TokenManager.getToken();
+      if (token == null) {
+        // Если токен не существует, возвращаем пустой Map
+        return {};
+      }
+      String? role = await TokenManager.getRole();
+      var url = Uri.parse('http://192.168.0.105:4000/api/$role/get');
+      var response = await http.post(
+        url,
+        headers: {'authorization': '$token'},
+      );
+      var data = json.decode(response.body);
+      return data['$role'];
     }
-    String? role = await TokenManager.getRole();
-    var url = Uri.parse('http://192.168.0.106:4000/api/$role/get');
-    var response = await http.post(
-      url,
-      headers: {'authorization': '$token'},
-    );
-    var data = json.decode(response.body);
-    return data['$role'];
-  }
-
   Widget _buildBirthDate(Map<String, dynamic> profileData) {
     if (profileData.containsKey("birthDate")) {
       DateTime birthDate = DateTime.parse(profileData["birthDate"]);
@@ -45,11 +97,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return Row(
         children: [
           Text(
-            'Date of Birth: ',
+            '${AppLocalizations.of(context)!.dateOfBirth}: ',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           Text(
-            '${birthDate.day}.${birthDate.month}.${birthDate.year} (Age: $age)',
+            '${birthDate.day}.${birthDate.month}.${birthDate.year} (${AppLocalizations.of(context)!.age}: $age)',
           ),
         ],
       );
@@ -68,13 +120,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             onPressed: () {
               Navigator.pushNamed(context, '/login');
             },
-            child: Text('Вход'),
+            child: Text(AppLocalizations.of(context)!.logIn),
           ),
           TextButton(
             onPressed: () {
               Navigator.pushNamed(context, '/signin');
             },
-            child: Text('Зарегистрироваться'),
+            child: Text(AppLocalizations.of(context)!.signIn),
           ),
         ],
       );
@@ -85,15 +137,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CircleAvatar(
-              radius: 60,
-              child: ClipOval(
-                child: profileData["avatar"] != null
-                    ? Image.network(
-                  profileData["avatar"]["src"],
-                  fit: BoxFit.cover, // Установите BoxFit.cover
-                )
-                    : Icon(Icons.person),
+            GestureDetector(
+              onTap: () {
+// При нажатии на аватарку, открываем диалоговое окно
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text(AppLocalizations.of(context)!.changeAvatar),
+                      content: Text(AppLocalizations.of(context)!.changeAvatarText),
+                      actions: <Widget>[
+// Кнопка Отмена
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text(AppLocalizations.of(context)!.cancel),
+                        ),
+// Кнопка Подтвердить
+                        TextButton(
+                          onPressed: () {
+// При подтверждении, вызываем метод для выбора новой аватарки
+                            _pickAvatar();
+                            Navigator.of(context).pop();
+                          },
+                          child: Text(AppLocalizations.of(context)!.confirm),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              child: CircleAvatar(
+                radius: 60,
+                child: ClipOval(
+                  child: profileData["avatar"] != null
+                      ? Image.network(
+                    'http://192.168.0.105:4000/api/uploads/avatar/${profileData["avatar"]["src"]}',
+                    fit: BoxFit.cover, // Установите BoxFit.cover
+                    width: 120, // Ширина изображения
+                    height: 120, // Высота изображения
+                  )
+                      : Icon(Icons.person),
+                ),
               ),
             ),
             SizedBox(height: 16),
@@ -114,7 +200,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'About:',
+                    AppLocalizations.of(context)!.profileAbout,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   ExpandableText(
@@ -133,7 +219,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Achievements:',
+                    AppLocalizations.of(context)!.achiv,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   ExpandableText(
@@ -152,7 +238,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Specialization:',
+                    AppLocalizations.of(context)!.specialization,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   ExpandableText(
@@ -169,7 +255,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Row(
                 children: [
                   Text(
-                    'Students: ',
+                    AppLocalizations.of(context)!.students,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   Text(
@@ -182,21 +268,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
             if (profileData["weight"] != null) ...[
               SizedBox(height: 8),
               Text(
-                'Weight: ${profileData["weight"]}',
+                '${AppLocalizations.of(context)!.weight}: ${profileData["weight"]}',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ],
             if (profileData["height"] != null) ...[
               SizedBox(height: 8),
               Text(
-                'Height: ${profileData["height"]}',
+                '${AppLocalizations.of(context)!.height}: ${profileData["height"]}',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ],
             if (profileData["goal"] != null) ...[
               SizedBox(height: 8),
               Text(
-                'Goal: ${profileData["goal"]}',
+                '${AppLocalizations.of(context)!.goal}: ${profileData["goal"]}',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ],
@@ -210,7 +296,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: Text(AppLocalizations.of(context)!.title_profile),
         actions: [
           IconButton(
             icon: Icon(Icons.edit),
@@ -228,20 +314,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: Text('Выход'),
-                    content: Text('Вы уверены, что хотите выйти?'),
+                    title: Text(AppLocalizations.of(context)!.exit),
+                    content: Text(AppLocalizations.of(context)!.exitQuestion),
                     actions: <Widget>[
                       TextButton(
                         onPressed: () {
                           Navigator.of(context).pop(false); // Отмена выхода
                         },
-                        child: Text('Отмена'),
+                        child: Text(AppLocalizations.of(context)!.cancel),
                       ),
                       TextButton(
                         onPressed: () {
                           Navigator.of(context).pop(true); // Подтверждение выхода
                         },
-                        child: Text('Выйти'),
+                        child: Text(AppLocalizations.of(context)!.exit),
                       ),
                     ],
                   );
