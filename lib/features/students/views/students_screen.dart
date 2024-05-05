@@ -1,6 +1,7 @@
 import 'package:training_sync/features/chat/views/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:training_sync/features/training_plan/views/training_plan_screen.dart';
 import 'dart:convert';
 import '../../../token_manager.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -210,7 +211,12 @@ class _StudentScreenState extends State<StudentScreen> {
                 IconButton(
                   icon: Icon(Icons.settings),
                   onPressed: () {
-                    // Action when settings icon is pressed
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TrainingPlanScreen(studentId: _students[index]['_id'], studentName: _students[index]['fullName']),
+                      ),
+                    );
                   },
                 ),
               ],

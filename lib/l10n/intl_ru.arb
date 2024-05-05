@@ -87,5 +87,8 @@
     "resetPassword": "Сбросить пароль",
     "getCode": "Получить код",
     "resetPasswordSuccess": "Пароль успешно сброшен",
-      "resetPasswordFailed": "Ошибка в сбросе пароля"
+      "resetPasswordFailed": "Ошибка в сбросе пароля",
+      "training_plan": "План тренировок для",
+      "addTraining": "Добавить тренировку",
+      "editTraining": "Изменить"
 }

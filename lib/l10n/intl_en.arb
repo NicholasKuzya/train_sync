@@ -87,5 +87,8 @@
   "resetPassword": "Reset password",
   "getCode": "Get code",
   "resetPasswordSuccess": "Password reset successfully",
-  "resetPasswordFailed": "Failed to reset password"
+  "resetPasswordFailed": "Failed to reset password",
+  "training_plan": "Training plan for",
+  "addTraining": "Add training",
+  "editTraining": "Edit"
 }

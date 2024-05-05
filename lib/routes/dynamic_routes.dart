@@ -1,6 +1,7 @@
 import 'package:training_sync/features/chat/views/chat_screen.dart';
 import 'package:training_sync/features/exercises/views/exercise_screen.dart';
 import 'package:training_sync/features/exercises/views/exercise_set_screen.dart';
+import 'package:training_sync/features/training_plan/views/training_plan_screen.dart';
 import 'package:training_sync/features/video_editor/views/video_editor_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:training_sync/features/any_profile/views/any_profile_screen.dart';
@@ -50,6 +51,16 @@ class DynamicRoutes {
       final setId = parts[2];
       return MaterialPageRoute(
         builder: (context) => ExerciseSetScreen(setId: setId),
+      );
+    }
+    if (settings.name!.startsWith('/setting/')) {
+      // Обработка динамического маршрута для чата
+      // Извлекаем идентификатор чата и студента из пути
+      final parts = settings.name!.split('/');
+      final studentId = parts[2];
+      final studentName = parts[3];
+      return MaterialPageRoute(
+        builder: (context) => TrainingPlanScreen(studentId: studentId, studentName: studentName),
       );
     }
     // Если маршрут не совпадает с динамическими маршрутами, вы можете вернуть
