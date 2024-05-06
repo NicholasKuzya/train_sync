@@ -5,6 +5,7 @@ import 'package:training_sync/features/training_plan/views/training_plan_screen.
 import 'package:training_sync/features/video_editor/views/video_editor_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:training_sync/features/any_profile/views/any_profile_screen.dart';
+import 'package:training_sync/features/workouts/views/workout_screen.dart';
 
 class DynamicRoutes {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -61,6 +62,15 @@ class DynamicRoutes {
       final studentName = parts[3];
       return MaterialPageRoute(
         builder: (context) => TrainingPlanScreen(studentId: studentId, studentName: studentName),
+      );
+    }
+    if (settings.name!.startsWith('/workout/')) {
+      // Обработка динамического маршрута для чата
+      // Извлекаем идентификатор чата и студента из пути
+      final parts = settings.name!.split('/');
+      final trainingId = parts[2];
+      return MaterialPageRoute(
+        builder: (context) => WorkoutAboutScreen(trainingId: trainingId),
       );
     }
     // Если маршрут не совпадает с динамическими маршрутами, вы можете вернуть

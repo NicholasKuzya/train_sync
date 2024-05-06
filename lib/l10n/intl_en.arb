@@ -90,5 +90,10 @@
   "resetPasswordFailed": "Failed to reset password",
   "training_plan": "Training plan for",
   "addTraining": "Add training",
-  "editTraining": "Edit"
+  "editTraining": "Edit",
+  "selectedExercise": "Select exercises",
+  "selectedSet": "Select sets",
+  "addDescription": "Add a description",
+  "myTraining": "My training plan",
+  "trainingAbout": "Training about"
 }

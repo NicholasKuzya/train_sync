@@ -21,6 +21,7 @@ class TrainingPlanScreen extends StatefulWidget {
 class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
   late DateTime _focusedDay = DateTime.now();
   late DateTime _selectedDay = DateTime.now();
+  TextEditingController _controller = TextEditingController();
   late List<DateTime> _trainingDates = [];
   List<dynamic> _selectedTrainings = [];
   List<dynamic> _selectedEvents = [];
@@ -84,15 +85,38 @@ class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
   }
 
   List<dynamic> _getTrainingsForDay(DateTime day) {
-    return _selectedEvent.where((training) {
+    List<dynamic> trainingsForDay = _selectedEvent.where((training) {
       var dateString = training['dates'][0]; // Получаем строку даты
       var dateParts = dateString
           .split('T')[0]
           .split('-'); // Разбиваем строку по символу 'T', затем по символу '-'
-      var trainingDate = DateTime.utc(int.parse(dateParts[0]),
-          int.parse(dateParts[1]), int.parse(dateParts[2]));
+      var trainingDate = DateTime.utc(
+          int.parse(dateParts[0]), int.parse(dateParts[1]), int.parse(dateParts[2]));
       return isSameDay(trainingDate, day);
     }).toList();
+
+    // Устанавливаем значение текста контроллера в соответствии с выбранной тренировкой
+    if (trainingsForDay.isNotEmpty) {
+      var training = trainingsForDay[0]; // Берем первую тренировку из списка
+      var dateString = training['dates'][0]; // Получаем строку даты
+      var dateParts = dateString
+          .split('T')[0]
+          .split('-'); // Разбиваем строку по символу 'T', затем по символу '-'
+      var trainingDate = DateTime.utc(
+          int.parse(dateParts[0]), int.parse(dateParts[1]), int.parse(dateParts[2]));
+
+      // Проверяем, является ли дата тренировки равной выбранной дате
+      if (isSameDay(trainingDate, day)) {
+        print(training['description']);
+        _controller.text = training['description'];
+      } else {
+        _controller.clear();
+      }
+    } else {
+      _controller.clear(); // Если тренировок нет на выбранную дату, очищаем контроллер
+    }
+
+    return trainingsForDay;
   }
 
   void _addTraining() async {
@@ -112,23 +136,17 @@ class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
       }
     }
 
-    // Проверяем, есть ли упражнения для выбранной даты
-    bool hasTrainingsForSelectedDate = _selectedTrainings.any((training) {
-      // Получаем дату тренировки из списка дат
-      DateTime trainingDate = DateTime.parse(training['dates'][0]);
-      // Сравниваем дату тренировки с выбранной датой
-      return isSameDay(trainingDate, _selectedDay);
-    });
+    // Определяем URL в зависимости от наличия тренировок для выбранной даты
+    String url = 'http://192.168.0.105:4000/api/student/training/add';
+    if (_selectedTrainings.isNotEmpty && _selectedTrainings.any((training) => training['dates'] != null && training['dates'].isNotEmpty && isSameDay(DateTime.parse(training['dates'][0]), _selectedDay))) {
+      // Если есть тренировки для выбранной даты, используем URL для обновления
+      url = 'http://192.168.0.105:4000/api/student/training/update/${_selectedTrainings[0]['_id']}';
+    }
 
     // Отправляем данные на сервер
     String? token = await TokenManager.getToken();
-    var url = Uri.parse(
-        hasTrainingsForSelectedDate
-            ? 'http://192.168.0.105:4000/api/student/training/update/${_selectedTrainings[0]['_id']}' // Если есть тренировки для выбранной даты, используем URL для обновления
-            : 'http://192.168.0.105:4000/api/student/training/add' // Иначе, используем URL для добавления новой тренировки
-    );
     var response = await http.post(
-      url,
+      Uri.parse(url),
       headers: {
         'authorization': '$token',
         'Content-Type': 'application/json'
@@ -136,6 +154,7 @@ class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
       body: json.encode({
         'studentId': widget.studentId,
         'dates': [_selectedDay.toIso8601String()],
+        'description': _controller.text,
         'exerciseIds': selectedExerciseIds,
         'exerciseSetIds': selectedSetIds,
       }),
@@ -203,6 +222,7 @@ class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
 
   void _showTrainingsModal(BuildContext context) {
     showModalBottomSheet(
+      isScrollControlled: true, // Растягивает модальное окно на всю доступную высоту экрана
       context: context,
       builder: (BuildContext bc) {
         return StatefulBuilder(
@@ -211,6 +231,16 @@ class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
+                  // Описание тренировки
+                  Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Text(
+                      _selectedTrainings.isNotEmpty
+                          ? _selectedTrainings[0]['description']
+                          : '', // Описание тренировки из базы данных
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
                   Container(
                     height: 200,
                     // Set a fixed height for the first ListView.builder
@@ -220,7 +250,7 @@ class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
                         final training = _selectedTrainings[index];
                         return Column(
                           children:
-                              training['exercises'].map<Widget>((exercise) {
+                          training['exercises'].map<Widget>((exercise) {
                             final exerciseName = exercise['name'];
                             final exerciseDescription = exercise['description'];
                             final exerciseId = exercise['_id'];
@@ -230,7 +260,8 @@ class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => ExerciseScreen(
-                                          exerciseId: exerciseId)),
+                                        exerciseId: exerciseId,
+                                      )),
                                 );
                               },
                               child: ListTile(
@@ -269,8 +300,9 @@ class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) =>
-                                          ExerciseSetScreen(setId: setId)),
+                                      builder: (context) => ExerciseSetScreen(
+                                        setId: setId,
+                                      )),
                                 );
                               },
                               child: ListTile(
@@ -296,7 +328,7 @@ class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
                       Navigator.pop(context);
                       _openModal(context);
                     },
-                    child: Text('Edit Training'),
+                    child: Text(AppLocalizations.of(context)!.editTraining),
                   ),
                 ],
               ),
@@ -310,6 +342,7 @@ class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
   void _openModal(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true, // Разрешаем прокрутку модального окна при появлении клавиатуры
       builder: (BuildContext bc) {
         return SingleChildScrollView(
           child: StatefulBuilder(
@@ -342,8 +375,16 @@ class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
+                  TextField(
+                    controller: _controller,
+                    maxLines: 5,
+                    decoration: InputDecoration(
+                      hintText: AppLocalizations.of(context)!.addDescription,
+                      border: OutlineInputBorder(),
+                    )
+                  ),
                   ListTile(
-                    title: Text('Exercises'),
+                    title: Text(AppLocalizations.of(context)!.selectedExercise),
                     onTap: () async {
                       isSelectingExercises = true;
                       showModalBottomSheet(
@@ -402,7 +443,7 @@ class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
                     },
                   ),
                   ListTile(
-                    title: Text('Sets'),
+                    title: Text(AppLocalizations.of(context)!.selectedSet),
                     onTap: () async {
                       isSelectingExercises = false;
                       showModalBottomSheet(
@@ -451,7 +492,7 @@ class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
                       _addTraining();
                       Navigator.of(context).pop();
                     },
-                    child: Text('Add Training'),
+                    child: Text(AppLocalizations.of(context)!.addTraining),
                   ),
                 ],
               );
