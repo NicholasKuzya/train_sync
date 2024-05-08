@@ -24,7 +24,7 @@ class _ExerciseSetScreenState extends State<ExerciseSetScreen> {
       print(widget.setId);
       final response = await http.get(
         Uri.parse(
-            'http://192.168.0.105:4000/api/trainer/set/${widget
+            'http://192.168.0.106:3000/api/trainer/set/${widget
                 .setId}'),
         headers: {
           'authorization': token,

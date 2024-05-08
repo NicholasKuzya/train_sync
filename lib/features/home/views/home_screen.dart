@@ -40,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
     String? role = await TokenManager.getRole();
     setState(() {
       if (_role != null) {
-      _role = role!;
+        _role = role!;
         if (_role == 'student') {
           _widgetOptions = _widgetOptionsForStudent;
         } else {
@@ -63,9 +63,12 @@ class _HomeScreenState extends State<HomeScreen> {
         if (_role == 'student') {
           Navigator.pushNamed(
               context, '/trainers'); // Переход на экран тренеров для студента
-        } else {
+        } else if(_role == 'trainer') {
           Navigator.pushNamed(
               context, '/students'); // Переход на экран студентов для тренера
+        } else {
+          Navigator.pushNamed(
+              context, '/profile');
         }
         break;
       case 2:
@@ -126,7 +129,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
-                        launch('mailto:${AppLocalizations.of(context)!.developer_email}');
+                        launch(
+                            'mailto:${AppLocalizations.of(context)!.developer_email}');
                       },
                   ),
                 ],
@@ -155,32 +159,43 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.home,
                 color: _selectedIndex == 0 ? Colors.blue : Colors.grey),
-            label: AppLocalizations.of(context)!.home, // Используем перевод для "Home"
+            label: AppLocalizations.of(context)!
+                .home, // Используем перевод для "Home"
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.group,
-                color: _selectedIndex == 1 ? Colors.blue : Colors.grey),
-            label: _role == 'student'
-                ? AppLocalizations.of(context)!.trainers // Используем перевод для "Trainers"
-                : AppLocalizations.of(context)!.students, // Используем перевод для "Students"
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(_role == 'student' ? Icons.calendar_today : Icons.image,
-                color: _selectedIndex == 2 ? Colors.blue : Colors.grey),
-            label: _role == 'student'
-                ? AppLocalizations.of(context)!.schedule // Используем перевод для "Schedule"
-                : AppLocalizations.of(context)!.gallery, // Используем перевод для "Gallery"
-          ),
+          if (_role == 'student' || _role == 'trainer') ...[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.group,
+                  color: _selectedIndex == 1 ? Colors.blue : Colors.grey),
+              label: _role == 'student'
+                  ? AppLocalizations.of(context)!
+                      .trainers // Используем перевод для "Trainers"
+                  : AppLocalizations.of(context)!
+                      .students, // Используем перевод для "Students"
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(
+                  _role == 'student' ? Icons.calendar_today : Icons.image,
+                  color: _selectedIndex == 2 ? Colors.blue : Colors.grey),
+              label: _role == 'student'
+                  ? AppLocalizations.of(context)!
+                      .schedule // Используем перевод для "Schedule"
+                  : AppLocalizations.of(context)!
+                      .gallery, // Используем перевод для "Gallery"
+            ),
+          ],
           BottomNavigationBarItem(
             icon: Icon(Icons.person,
                 color: _selectedIndex == 3 ? Colors.blue : Colors.grey),
-            label: AppLocalizations.of(context)!.profile, // Используем перевод для "Profile"
+            label: AppLocalizations.of(context)!
+                .profile, // Используем перевод для "Profile"
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.store,
-                color: _selectedIndex == 4 ? Colors.blue : Colors.grey),
-            label: AppLocalizations.of(context)!.store, // Используем перевод для "Store"
-          ),
+          if (_role == 'student' || _role == 'trainer')
+            BottomNavigationBarItem(
+              icon: Icon(Icons.store,
+                  color: _selectedIndex == 4 ? Colors.blue : Colors.grey),
+              label: AppLocalizations.of(context)!
+                  .store, // Используем перевод для "Store"
+            ),
         ],
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,

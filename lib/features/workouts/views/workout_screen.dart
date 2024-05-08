@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../token_manager.dart';
+import 'package:training_sync/features/exercises/views/exercise_screen.dart';
+import 'package:training_sync/features/exercises/views/exercise_set_screen.dart';
 
 class WorkoutAboutScreen extends StatefulWidget {
   final String trainingId;
@@ -18,7 +20,7 @@ class _WorkoutAboutScreenState extends State<WorkoutAboutScreen> {
 
   void _fetchTrainingData() async {
     String? token = await TokenManager.getToken();
-    var url = Uri.parse('http://192.168.0.105:4000/api/student/get/training/${widget.trainingId}');
+    var url = Uri.parse('http://192.168.0.106:3000/api/student/get/training/${widget.trainingId}');
     var response = await http.get(
       url,
       headers: {'authorization': '$token'},
@@ -59,29 +61,77 @@ class _WorkoutAboutScreenState extends State<WorkoutAboutScreen> {
               'Exercises:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            for (var exercise in _trainingData['exercises'])
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text('Name: ${exercise['name']}'),
-                  Text('Description: ${exercise['description']}'),
-                  SizedBox(height: 8),
-                ],
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: _trainingData['exercises'].map<Widget>((exercise) {
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ExerciseScreen(exerciseId: exercise['_id']),
+                      ),
+                    );
+                  },
+                  child: Card(
+                    elevation: 4,
+                    margin: EdgeInsets.symmetric(vertical: 8),
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Name: ${exercise['name']}',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 8),
+                          Text('Description: ${exercise['description']}'),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
             SizedBox(height: 16),
             Text(
               'Exercise Sets:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            for (var exerciseSet in _trainingData['exerciseSets'])
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text('Name: ${exerciseSet['name']}'),
-                  Text('Description: ${exerciseSet['description']}'),
-                  SizedBox(height: 8),
-                ],
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: _trainingData['exerciseSets'].map<Widget>((exerciseSet) {
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ExerciseSetScreen(setId: exerciseSet['_id']),
+                      ),
+                    );
+                  },
+                  child: Card(
+                    elevation: 4,
+                    margin: EdgeInsets.symmetric(vertical: 8),
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Name: ${exerciseSet['name']}',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 8),
+                          Text('Description: ${exerciseSet['description']}'),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
           ],
         ),
       ),

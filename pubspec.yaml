@@ -1,9 +1,9 @@
 name: training_sync
-description: "A new Flutter project."
+description: "In the Training Sync application, a trainer can train a student regardless of where he is, without being tied to the place of both the trainer and the student. They can complete training plans with detailed exercise descriptions and video examples. The application contains all the necessary functions for good interaction between student and coach."
+author: Nikolay Kuziev
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
 # followed by an optional build number separated by a +.
@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+1
+version: 1.0.0-beta.1
 
 environment:
   sdk: '>=3.3.4 <4.0.0'
@@ -50,7 +50,11 @@ flutter:
   uses-material-design: true
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.13.1
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^3.0.0
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo.png"

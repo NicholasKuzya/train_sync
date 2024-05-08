@@ -5,6 +5,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:video_player/video_player.dart';
 import 'dart:core';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ExerciseScreen extends StatefulWidget {
   final String exerciseId;
@@ -26,7 +27,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
       print(widget.exerciseId);
       final response = await http.get(
         Uri.parse(
-            'http://192.168.0.105:4000/api/trainer/exercises/${widget.exerciseId}'),
+            'http://192.168.0.106:3000/api/trainer/exercises/${widget.exerciseId}'),
         headers: {
           'authorization': token,
         },
@@ -39,7 +40,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
           exercise = responseBody['exercise'];
           // Initialize video player controller after exercise data is fetched
           _controller = VideoPlayerController.network(
-              'http://192.168.0.105:4000/api/uploads/exercises/${exercise['videoPath']}')
+              'http://192.168.0.106:3000/api/uploads/videos/exercises/${exercise['videoPath']}')
             ..initialize().then((_) {
               setState(() {});
             });
@@ -63,7 +64,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
     // Здесь вы можете вернуть виджет, который будет отображаться на экране упражнения
     return Scaffold(
       appBar: AppBar(
-        title: Text('Exercise Details'),
+        title: Text(AppLocalizations.of(context)!.exerciseDetails),
       ),
       body: Column(
         children: [

@@ -31,6 +31,14 @@ android {
         disable 'InvalidPackage', 'UnusedResources' // Отключает определённые типы предупреждений
         // Другие параметры lintOptions...
     }
+    signingConfigs {
+        release {
+            storeFile file("my-release-key.jks")
+            storePassword "key password"
+            keyAlias "my-key-alias"
+            keyPassword "key password"
+        }
+    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -60,7 +68,8 @@ android {
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
+//            signingConfig signingConfigs.debug
         }
     }
 }

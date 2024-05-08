@@ -24,6 +24,7 @@
     "accept_text_true": "Are you sure you want to accept this request?",
     "accept_text_false": "Are you sure you want to reject this request?",
     "cancel": "Cancel",
+    "send": "Send",
     "data_loaded_error": "Error: data not loaded",
     "network_error_check_connection": "Network error. Check your internet connection.",
 "enter_message": "Enter message",
@@ -95,5 +96,9 @@
   "selectedSet": "Select sets",
   "addDescription": "Add a description",
   "myTraining": "My training plan",
-  "trainingAbout": "Training about"
+  "trainingAbout": "Training about",
+  "exerciseDetails": "Exercise details",
+  "trainers": "Trainers",
+  "sendRequest": "Send request",
+  "searchTrainers": "Find a coach"
 }

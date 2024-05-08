@@ -21,12 +21,13 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
   void _fetchTrainings() async {
     String? token = await TokenManager.getToken();
-    var url = Uri.parse('http://192.168.0.105:4000/api/student/get/training');
+    var url = Uri.parse('http://192.168.0.106:3000/api/student/get/training');
     var response = await http.get(
       url,
-      headers: {'authorization': '$token', 'Content-Type': 'application/json'},
+      headers: {'authorization': '$token'},
     );
     var responseBody = json.decode(response.body);
+    print(responseBody);
     if (responseBody['success']) {
       setState(() {
         _trainingDates = (responseBody['student']['trainingPlans'] as List)

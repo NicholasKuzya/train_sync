@@ -24,6 +24,7 @@
   "accept_message_true": "Запрос принят",
   "accept_message_false": "Запрос отклонен",
   "cancel": "Отмена",
+  "send": "Отправить",
   "data_loaded_error": "Ошибка: данные не загружены",
   "network_error_check_connection": "Ошибка сети. Проверьте подключение к интернету.",
 "enter_message": "Введите сообщение",
@@ -95,5 +96,9 @@
   "selectedSet": "Выберите сеты",
   "addDescription": "Добавьте описание",
   "myTraining": "Моё тренировочное расписание",
-  "trainingAbout": "О тренировке"
+  "trainingAbout": "О тренировке",
+  "exerciseDetails": "Подробности упражнения",
+  "trainers": "Тренеры",
+  "sendRequest": "Отправить запрос",
+  "searchTrainers": "Найти тренера"
 }
