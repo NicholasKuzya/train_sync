@@ -66,94 +66,99 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.exerciseDetails),
       ),
-      body: Stack(
+      body: Column(
         children: [
-          if (_controller != null && _controller!.value.isInitialized) ...[
-            AspectRatio(
-              aspectRatio: _controller!.value.aspectRatio,
-              child: Stack(
-                alignment: Alignment.bottomCenter,
+          Stack(
+            children: [
+              if (_controller != null && _controller!.value.isInitialized) ...[
+                AspectRatio(
+                  aspectRatio: _controller!.value.aspectRatio,
+                  child: Stack(
+                    alignment: Alignment.bottomCenter,
+                    children: [
+                      VideoPlayer(_controller!),
+                      // Ползунок для перемотки видео
+                      VideoProgressIndicator(
+                        _controller!,
+                        allowScrubbing: true,
+                        colors: VideoProgressColors(
+                          playedColor: Colors.red,
+                          bufferedColor: Colors.grey,
+                          backgroundColor: Colors.white,
+                        ),
+                      ),
+                      // Кнопка для паузы/воспроизведения
+                      Positioned(
+                        bottom: 10.0,
+                        left: 10.0,
+                        child: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              if (_controller!.value.isPlaying) {
+                                _controller!.pause();
+                              } else {
+                                _controller!.play();
+                              }
+                            });
+                          },
+                          icon: Icon(
+                            _controller!.value.isPlaying
+                                ? Icons.pause
+                                : Icons.play_arrow,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      // Иконка для управления звуком
+                      Positioned(
+                        bottom: 10.0,
+                        right: 10.0,
+                        child: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _controller!.value.volume == 0
+                                  ? _controller!.setVolume(1)
+                                  : _controller!.setVolume(0);
+                            });
+                          },
+                          icon: Icon(
+                            _controller!.value.volume == 0
+                                ? Icons.volume_off
+                                : Icons.volume_up,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ] else
+                Center(
+                  child: CircularProgressIndicator(),
+                ),
+            ],
+          ),
+          SingleChildScrollView(
+            child: Container(
+              margin: EdgeInsets.all(10.0),
+              child: Column(
                 children: [
-                  VideoPlayer(_controller!),
-                  // Ползунок для перемотки видео
-                  VideoProgressIndicator(
-                    _controller!,
-                    allowScrubbing: true,
-                    colors: VideoProgressColors(
-                      playedColor: Colors.red,
-                      bufferedColor: Colors.grey,
-                      backgroundColor: Colors.white,
+                  Text(
+                    '${exercise['name']}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22,
                     ),
                   ),
-                  // Кнопка для паузы/воспроизведения
-                  Positioned(
-                    bottom: 10.0,
-                    left: 10.0,
-                    child: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          if (_controller!.value.isPlaying) {
-                            _controller!.pause();
-                          } else {
-                            _controller!.play();
-                          }
-                        });
-                      },
-                      icon: Icon(
-                        _controller!.value.isPlaying
-                            ? Icons.pause
-                            : Icons.play_arrow,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  // Иконка для управления звуком
-                  Positioned(
-                    bottom: 10.0,
-                    right: 10.0,
-                    child: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _controller!.value.volume == 0
-                              ? _controller!.setVolume(1)
-                              : _controller!.setVolume(0);
-                        });
-                      },
-                      icon: Icon(
-                        _controller!.value.volume == 0
-                            ? Icons.volume_off
-                            : Icons.volume_up,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
+                  SizedBox(height: 4.0),
+                  Text('${exercise['description']}')
                 ],
               ),
             ),
-            SingleChildScrollView(
-              child: Container(
-                margin: EdgeInsets.all(10.0),
-                child: Column(
-                  children: [
-                    Text(
-                      '${exercise['name']}',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 22,
-                      ),
-                    ),
-                    SizedBox(height: 4.0),
-                    Text('${exercise['description']}')
-                  ],
-                ),
-              ),
-            )
-          ] else
-            Center(
-              child: CircularProgressIndicator(),
-            ),
+          ),
         ],
       ),
+
     );
   }
 
