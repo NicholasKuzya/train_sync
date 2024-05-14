@@ -27,7 +27,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
       print(widget.exerciseId);
       final response = await http.get(
         Uri.parse(
-            'http://192.168.0.106:3000/api/trainer/exercises/${widget.exerciseId}'),
+            'http://192.168.0.105:3000/api/trainer/exercises/${widget.exerciseId}'),
         headers: {
           'authorization': token,
         },
@@ -40,7 +40,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
           exercise = responseBody['exercise'];
           // Initialize video player controller after exercise data is fetched
           _controller = VideoPlayerController.network(
-              'http://192.168.0.106:3000/api/uploads/videos/exercises/${exercise['videoPath']}')
+              'http://192.168.0.105:3000/api/uploads/videos/exercises/${exercise['videoPath']}')
             ..initialize().then((_) {
               setState(() {});
             });
@@ -66,7 +66,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.exerciseDetails),
       ),
-      body: Column(
+      body: Stack(
         children: [
           if (_controller != null && _controller!.value.isInitialized) ...[
             AspectRatio(
@@ -149,9 +149,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
               ),
             )
           ] else
-            Positioned(
-              top: 150.0,
-              left: 50.0,
+            Center(
               child: CircularProgressIndicator(),
             ),
         ],

@@ -62,7 +62,7 @@ class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
 
   void _fetchTrainings() async {
     String? token = await TokenManager.getToken();
-    var url = Uri.parse('http://192.168.0.106:3000/api/student/training/get');
+    var url = Uri.parse('http://192.168.0.105:3000/api/student/training/get');
     var response = await http.post(
       url,
       headers: {'authorization': '$token', 'Content-Type': 'application/json'},
@@ -137,10 +137,10 @@ class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
     }
 
     // Определяем URL в зависимости от наличия тренировок для выбранной даты
-    String url = 'http://192.168.0.106:3000/api/student/training/add';
+    String url = 'http://192.168.0.105:3000/api/student/training/add';
     if (_selectedTrainings.isNotEmpty && _selectedTrainings.any((training) => training['dates'] != null && training['dates'].isNotEmpty && isSameDay(DateTime.parse(training['dates'][0]), _selectedDay))) {
       // Если есть тренировки для выбранной даты, используем URL для обновления
-      url = 'http://192.168.0.106:3000/api/student/training/update/${_selectedTrainings[0]['_id']}';
+      url = 'http://192.168.0.105:3000/api/student/training/update/${_selectedTrainings[0]['_id']}';
     }
 
     // Отправляем данные на сервер
@@ -516,7 +516,7 @@ class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
   Future<void> _fetchExercises() async {
     String? token = await TokenManager.getToken();
     final Uri url = Uri.parse(
-        'http://192.168.0.106:3000/api/trainer/exercises?categoryId=');
+        'http://192.168.0.105:3000/api/trainer/exercises?categoryId=');
     final response = await http.get(
       url,
       headers: {'authorization': token!},
@@ -538,7 +538,7 @@ class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
 
   Future<void> _fetchSets() async {
     String? token = await TokenManager.getToken();
-    final Uri url = Uri.parse('http://192.168.0.106:3000/api/trainer/set');
+    final Uri url = Uri.parse('http://192.168.0.105:3000/api/trainer/set');
     final response = await http.get(
       url,
       headers: {'authorization': token!},

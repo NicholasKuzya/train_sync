@@ -33,7 +33,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
   // Метод для отправки изображения на сервер
   Future<void> _uploadAvatar(XFile imageFile) async {
-    final url = Uri.parse('http://192.168.0.106:3000/api/media/avatar');
+    final url = Uri.parse('http://192.168.0.105:3000/api/media/avatar');
     String? token = await TokenManager.getToken();
     if(token != null) {
       final request = http.MultipartRequest('POST', url);
@@ -81,7 +81,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return {};
       }
       String? role = await TokenManager.getRole();
-      var url = Uri.parse('http://192.168.0.106:3000/api/$role/get');
+      var url = Uri.parse('http://192.168.0.105:3000/api/$role/get');
       var response = await http.post(
         url,
         headers: {'authorization': '$token'},
@@ -175,7 +175,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: ClipOval(
                   child: profileData["avatar"] != null
                       ? Image.network(
-                    'http://192.168.0.106:3000/api/uploads/avatar/${profileData["avatar"]["src"]}',
+                    'http://192.168.0.105:3000/api/uploads/avatar/${profileData["avatar"]["src"]}',
                     fit: BoxFit.cover, // Установите BoxFit.cover
                     width: 120, // Ширина изображения
                     height: 120, // Высота изображения

@@ -47,7 +47,7 @@ class _TrainerInputScreenState extends State<TrainerInputScreen> {
       return;
     }
     final response = await http.get(
-      Uri.parse('http://192.168.0.106:3000/api/trainer/get/all?country=$_selectedCountry&city=$_selectedCity&district=$_selectedDistrict&sortBy=$_selectedSortBy&searchQuery=$_searchQuery'),
+      Uri.parse('http://192.168.0.105:3000/api/trainer/get/all?country=$_selectedCountry&city=$_selectedCity&district=$_selectedDistrict&sortBy=$_selectedSortBy&searchQuery=$_searchQuery'),
       headers: {
         'authorization': token,
         'Content-Type': 'application/json'
@@ -102,7 +102,7 @@ class _TrainerInputScreenState extends State<TrainerInputScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.0.106:3000/api/student/training/send-request'),
+        Uri.parse('http://192.168.0.105:3000/api/student/training/send-request'),
         headers: {
           'authorization': token,
           'Content-Type': 'application/json'
@@ -260,7 +260,7 @@ class _TrainerInputScreenState extends State<TrainerInputScreen> {
                               child: ClipOval(
                                 child: trainer.avatarUrl.isNotEmpty && trainer.avatarUrl != ""
                                     ? Image.network(
-                                  'http://192.168.0.106:3000/api/uploads/avatar/${trainer.avatarUrl}',
+                                  'http://192.168.0.105:3000/api/uploads/avatar/${trainer.avatarUrl}',
                                   fit: BoxFit.cover,
                                   width: 60, // Ширина изображения
                                   height: 60,
@@ -295,7 +295,7 @@ class _TrainerInputScreenState extends State<TrainerInputScreen> {
 
                                   // Отправляем запрос на получение studentId
                                   var studentResponse = await http.post(
-                                    Uri.parse('http://192.168.0.106:3000/api/student/get'),
+                                    Uri.parse('http://192.168.0.105:3000/api/student/get'),
                                     headers: {'authorization': '$token'},
                                   );
                                   var studentData = json.decode(studentResponse.body);
@@ -310,7 +310,7 @@ class _TrainerInputScreenState extends State<TrainerInputScreen> {
                                   if (studentId != null) {
                                     // Отправляем запрос на создание чата
                                     var createChatResponse = await http.post(
-                                      Uri.parse('http://192.168.0.106:3000/api/chat/create'),
+                                      Uri.parse('http://192.168.0.105:3000/api/chat/create'),
                                       headers: {'authorization': '$token', 'Content-Type': 'application/json'},
                                       body: json.encode({
                                         'studentId': studentId,

@@ -20,7 +20,7 @@ class _WorkoutAboutScreenState extends State<WorkoutAboutScreen> {
 
   void _fetchTrainingData() async {
     String? token = await TokenManager.getToken();
-    var url = Uri.parse('http://192.168.0.106:3000/api/student/get/training/${widget.trainingId}');
+    var url = Uri.parse('http://192.168.0.105:3000/api/student/get/training/${widget.trainingId}');
     var response = await http.get(
       url,
       headers: {'authorization': '$token'},

@@ -49,7 +49,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     });
 
     if (_role != null && _role!.isNotEmpty) {
-      var url = Uri.parse('http://192.168.0.106:3000/api/$_role/get');
+      var url = Uri.parse('http://192.168.0.105:3000/api/$_role/get');
       var response = await http.post(
         url,
         headers: {'authorization': '$token'},
@@ -193,7 +193,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<void> _saveChanges() async {
     String? token = await TokenManager.getToken();
     if (_role != null && _role!.isNotEmpty) {
-      var url = Uri.parse('http://192.168.0.106:3000/api/$_role/update');
+      var url = Uri.parse('http://192.168.0.105:3000/api/$_role/update');
       Map<String, dynamic> requestBody = {
         "fullName": _fullNameController.text,
         "country": _countryController.text,

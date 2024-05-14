@@ -31,7 +31,7 @@ class _ChatScreenState extends State<ChatScreen> {
         TextEditingController(); // Инициализируем контроллер сообщений
 
     // Подключение к серверу
-    socket = IO.io('http://192.168.0.106:3000', <String, dynamic>{
+    socket = IO.io('http://192.168.0.105:3000', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
     });
@@ -82,7 +82,7 @@ class _ChatScreenState extends State<ChatScreen> {
       return;
     }
     String? role = await TokenManager.getRole();
-    var url = Uri.parse('http://192.168.0.106:3000/api/$role/get');
+    var url = Uri.parse('http://192.168.0.105:3000/api/$role/get');
     var response = await http.post(
       url,
       headers: {'authorization': '$token'},
@@ -113,7 +113,7 @@ class _ChatScreenState extends State<ChatScreen> {
       role = "trainer";
     }
     var url = Uri.parse(
-        'http://192.168.0.106:3000/api/$role/get/${widget.companionId}');
+        'http://192.168.0.105:3000/api/$role/get/${widget.companionId}');
     var response = await http.post(
       url,
       headers: {'authorization': '$token'},
@@ -156,7 +156,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _fetchChatMessages() async {
     try {
       String? token = await TokenManager.getToken();
-      var url = Uri.parse('http://192.168.0.106:3000/api/chat/messages');
+      var url = Uri.parse('http://192.168.0.105:3000/api/chat/messages');
       var response = await http.post(
         url,
         headers: {

@@ -29,7 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
     String email = _emailController.text;
     String password = _passwordController.text;
 
-    String url = 'http://192.168.0.106:3000/api/$_userType/login';
+    String url = 'http://192.168.0.105:3000/api/$_userType/login';
 
     var data = {'email': email, 'password': password};
 
@@ -54,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _sendResetCode() async {
     String email = _emailController.text;
 
-    String url = 'http://192.168.0.106:3000/api/$_userType/reset/code';
+    String url = 'http://192.168.0.105:3000/api/$_userType/reset/code';
 
     var data = {'email': email};
 
@@ -89,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
     String code = _codeController.text;
     String newPassword = _newPasswordController.text;
 
-    String url = 'http://192.168.0.106:3000/api/$_userType/reset/pass';
+    String url = 'http://192.168.0.105:3000/api/$_userType/reset/pass';
 
     var data = {'email': email, 'code': code, 'newPassword': newPassword};
 
