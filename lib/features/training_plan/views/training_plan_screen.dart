@@ -7,6 +7,7 @@ import 'package:training_sync/features/exercises/views/exercise_set_screen.dart'
 import 'package:training_sync/token_manager.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:training_sync/admob_service.dart';
 
 class TrainingPlanScreen extends StatefulWidget {
   final String studentId;
@@ -214,6 +215,7 @@ class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
               },
               child: Text(AppLocalizations.of(context)!.addTraining),
             ),
+            AdBanner()
           ],
         ),
       ),

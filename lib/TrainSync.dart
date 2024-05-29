@@ -11,7 +11,7 @@ class TrainSync extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Train Sync',
+        title: 'Training Sync',
         localizationsDelegates: [
           AppLocalizations.delegate, // Делегат для загрузки локализаций
           GlobalMaterialLocalizations.delegate,

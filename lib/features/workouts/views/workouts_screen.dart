@@ -5,6 +5,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:training_sync/features/workouts/views/workout_screen.dart';
 import '../../../token_manager.dart';
+import 'package:training_sync/admob_service.dart';
 
 class WorkoutScreen extends StatefulWidget {
   const WorkoutScreen({Key? key}) : super(key: key);
@@ -113,6 +114,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
               eventLoader: (day) =>
               _trainingDates.contains(day) ? ['event'] : [],
             ),
+            AdBanner()
           ],
         ),
       ),

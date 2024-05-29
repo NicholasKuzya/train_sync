@@ -6,6 +6,7 @@ import 'package:training_sync/features/store/views/store_screen.dart';
 import 'package:training_sync/features/students/views/students_screen.dart';
 import 'package:training_sync/features/trainers/views/trainers_screen.dart';
 import 'package:training_sync/features/workouts/views/workouts_screen.dart';
+import 'package:training_sync/politics_screen.dart';
 import '../features/home/home.dart';
 import '../features/authentication/registration/registration.dart';
 import '../features/authentication/login/login.dart';
@@ -21,5 +22,6 @@ final routes = {
   '/trainers': (context) => TrainerInputScreen(),
   '/gallery' : (context) => GalleryScreen(),
   '/store' : (context) => StoreScreen(),
-  '/workout' : (context) => WorkoutScreen()
+  '/workout' : (context) => WorkoutScreen(),
+  '/politics': (context) => PoliticsScreen()
 };

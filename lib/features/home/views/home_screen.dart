@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:training_sync/politics_screen.dart';
+import 'package:training_sync/terms_screen.dart';
 import '../../../token_manager.dart';
 import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'dart:io';
+import 'package:training_sync/admob_service.dart';
+
 // AppLocalizations.of(context)!.title_home
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -16,6 +23,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   String _role = '';
+  BannerAd? _bannerAd;
+  bool _isBannerAdReady = false;
 
   List<Widget> _widgetOptionsForTrainer = <Widget>[
     Text('Home'),
@@ -34,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   List<Widget> _widgetOptions =
-      []; // Список будет инициализирован в _checkUserRole()
+  []; // Список будет инициализирован в _checkUserRole()
 
   Future<void> _checkUserRole() async {
     String? role = await TokenManager.getRole();
@@ -91,6 +100,11 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _checkUserRole();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -151,56 +165,101 @@ class _HomeScreenState extends State<HomeScreen> {
                 fontSize: 16.0,
               ),
             ),
+            RichText(
+              text: TextSpan(
+                text: ' ${AppLocalizations.of(context)!.privacy_policy}',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  color: Colors.blue,
+                  decoration: TextDecoration.underline,
+                ),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () async {
+                    final url = 'http://training-sync.com/policy';
+                    if (await canLaunch(url)) {
+                      await launch(url);
+                    } else {
+                      throw 'Could not launch $url';
+                    }
+                  },
+              ),
+            ),
+            SizedBox(height: 16),
+            RichText(
+              text: TextSpan(
+                text: ' ${AppLocalizations.of(context)!.terms_of_service}',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  color: Colors.blue,
+                  decoration: TextDecoration.underline,
+                ),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () async {
+                    final url = 'http://training-sync.com/terms';
+                    if (await canLaunch(url)) {
+                      await launch(url);
+                    } else {
+                      throw 'Could not launch $url';
+                    }
+                  },
+              ),
+            ),
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home,
-                color: _selectedIndex == 0 ? Colors.blue : Colors.grey),
-            label: AppLocalizations.of(context)!
-                .home, // Используем перевод для "Home"
-          ),
-          if (_role == 'student' || _role == 'trainer') ...[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.group,
-                  color: _selectedIndex == 1 ? Colors.blue : Colors.grey),
-              label: _role == 'student'
-                  ? AppLocalizations.of(context)!
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AdBanner(),
+          BottomNavigationBar(
+            items: <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home,
+                    color: _selectedIndex == 0 ? Colors.blue : Colors.grey),
+                label: AppLocalizations.of(context)!
+                    .home, // Используем перевод для "Home"
+              ),
+              if (_role == 'student' || _role == 'trainer') ...[
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.group,
+                      color: _selectedIndex == 1 ? Colors.blue : Colors.grey),
+                  label: _role == 'student'
+                      ? AppLocalizations.of(context)!
                       .trainers // Используем перевод для "Trainers"
-                  : AppLocalizations.of(context)!
+                      : AppLocalizations.of(context)!
                       .students, // Используем перевод для "Students"
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                  _role == 'student' ? Icons.calendar_today : Icons.image,
-                  color: _selectedIndex == 2 ? Colors.blue : Colors.grey),
-              label: _role == 'student'
-                  ? AppLocalizations.of(context)!
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(
+                      _role == 'student' ? Icons.calendar_today : Icons.image,
+                      color: _selectedIndex == 2 ? Colors.blue : Colors.grey),
+                  label: _role == 'student'
+                      ? AppLocalizations.of(context)!
                       .schedule // Используем перевод для "Schedule"
-                  : AppLocalizations.of(context)!
+                      : AppLocalizations.of(context)!
                       .gallery, // Используем перевод для "Gallery"
-            ),
-          ],
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person,
-                color: _selectedIndex == 3 ? Colors.blue : Colors.grey),
-            label: AppLocalizations.of(context)!
-                .profile, // Используем перевод для "Profile"
+                ),
+              ],
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person,
+                    color: _selectedIndex == 3 ? Colors.blue : Colors.grey),
+                label: AppLocalizations.of(context)!
+                    .profile, // Используем перевод для "Profile"
+              ),
+              if (_role == 'student' || _role == 'trainer')
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.store,
+                      color: _selectedIndex == 4 ? Colors.blue : Colors.grey),
+                  label: AppLocalizations.of(context)!
+                      .store, // Используем перевод для "Store"
+                ),
+            ],
+            currentIndex: _selectedIndex,
+            onTap: _onItemTapped,
+            selectedItemColor: Colors.blue,
+            unselectedItemColor: Colors.grey,
           ),
-          if (_role == 'student' || _role == 'trainer')
-            BottomNavigationBarItem(
-              icon: Icon(Icons.store,
-                  color: _selectedIndex == 4 ? Colors.blue : Colors.grey),
-              label: AppLocalizations.of(context)!
-                  .store, // Используем перевод для "Store"
-            ),
         ],
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
       ),
     );
   }

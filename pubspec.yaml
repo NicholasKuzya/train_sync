@@ -45,6 +45,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   fluttertoast: any
   url_launcher: ^6.2.6
+  google_mobile_ads: ^5.1.0
 
 flutter:
   generate: true

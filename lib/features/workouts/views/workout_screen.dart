@@ -5,6 +5,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../token_manager.dart';
 import 'package:training_sync/features/exercises/views/exercise_screen.dart';
 import 'package:training_sync/features/exercises/views/exercise_set_screen.dart';
+import 'package:training_sync/admob_service.dart';
 
 class WorkoutAboutScreen extends StatefulWidget {
   final String trainingId;
@@ -45,95 +46,108 @@ class _WorkoutAboutScreenState extends State<WorkoutAboutScreen> {
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.trainingAbout),
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              'Description:',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            Text('${_trainingData['description']}'),
-            SizedBox(height: 16),
-            Text(
-              'Exercises:',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: _trainingData['exercises'].map<Widget>((exercise) {
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ExerciseScreen(exerciseId: exercise['_id']),
-                      ),
-                    );
-                  },
-                  child: Card(
-                    elevation: 4,
-                    margin: EdgeInsets.symmetric(vertical: 8),
-                    child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Name: ${exercise['name']}',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(height: 8),
-                          Text('Description: ${exercise['description']}'),
-                        ],
-                      ),
-                    ),
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 50), // Adjust the padding to account for the ad banner
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'Description:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                );
-              }).toList(),
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Exercise Sets:',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: _trainingData['exerciseSets'].map<Widget>((exerciseSet) {
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ExerciseSetScreen(setId: exerciseSet['_id']),
-                      ),
-                    );
-                  },
-                  child: Card(
-                    elevation: 4,
-                    margin: EdgeInsets.symmetric(vertical: 8),
-                    child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Name: ${exerciseSet['name']}',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(height: 8),
-                          Text('Description: ${exerciseSet['description']}'),
-                        ],
-                      ),
-                    ),
+                  SizedBox(height: 8),
+                  Text('${_trainingData['description']}'),
+                  SizedBox(height: 16),
+                  Text(
+                    'Exercises:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                );
-              }).toList(),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: _trainingData['exercises']?.map<Widget>((exercise) {
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ExerciseScreen(exerciseId: exercise['_id']),
+                            ),
+                          );
+                        },
+                        child: Card(
+                          elevation: 4,
+                          margin: EdgeInsets.symmetric(vertical: 8),
+                          child: Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Name: ${exercise['name']}',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(height: 8),
+                                Text('Description: ${exercise['description']}'),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    })?.toList() ?? [],
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Exercise Sets:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: _trainingData['exerciseSets']?.map<Widget>((exerciseSet) {
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ExerciseSetScreen(setId: exerciseSet['_id']),
+                            ),
+                          );
+                        },
+                        child: Card(
+                          elevation: 4,
+                          margin: EdgeInsets.symmetric(vertical: 8),
+                          child: Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Name: ${exerciseSet['name']}',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(height: 8),
+                                Text('Description: ${exerciseSet['description']}'),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    })?.toList() ?? [],
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: AdBanner(), // Replace with your ad banner widget
+          ),
+        ],
       ),
     );
   }

@@ -7,6 +7,7 @@ import '../../../../token_manager.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart' as picker;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SigninScreen extends StatefulWidget {
   @override
@@ -399,7 +400,38 @@ class _SigninScreenState extends State<SigninScreen> {
                     ),
                   ],
                 ),
-
+              Text(
+                AppLocalizations.of(context)!.enterPolicyAndTerms,
+                textAlign: TextAlign.center,
+              ),
+              GestureDetector(
+                onTap: () {
+                  launch('http://training-sync.com/policy');
+                },
+                child: Text(
+                  AppLocalizations.of(context)!.privacy_policy,
+                  style: TextStyle(
+                    color: Colors.blue,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+              Text(
+                ' & ',
+                textAlign: TextAlign.center,
+              ),
+              GestureDetector(
+                onTap: () {
+                  launch('http://training-sync.com/terms');
+                },
+                child: Text(
+                  AppLocalizations.of(context)!.terms_of_service,
+                  style: TextStyle(
+                    color: Colors.blue,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
               // Кнопка отправки и логика валидации (перемещена за пределы блока условия)
               ElevatedButton(
                 onPressed: () {
