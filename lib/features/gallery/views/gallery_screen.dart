@@ -100,8 +100,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
   Future<void> _fetchExercises(String token, {String? category}) async {
     final Uri url = category != null
         ? Uri.parse(
-            'http://192.168.0.105:3000/api/trainer/exercises?categoryId=$category')
-        : Uri.parse('http://192.168.0.105:3000/api/trainer/exercises');
+            'https://training-sync.com/api/trainer/exercises?categoryId=$category')
+        : Uri.parse('https://training-sync.com/api/trainer/exercises');
 
     final response = await http.get(
       url,
@@ -123,8 +123,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
   Future<void> _fetchSets(String token, {String? category}) async {
     final Uri url = category != null
         ? Uri.parse(
-            'http://192.168.0.105:3000/api/trainer/set?categoryId=$category')
-        : Uri.parse('http://192.168.0.105:3000/api/trainer/set');
+            'https://training-sync.com/api/trainer/set?categoryId=$category')
+        : Uri.parse('https://training-sync.com/api/trainer/set');
 
     final response = await http.get(
       url,
@@ -146,7 +146,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
   // Метод для загрузки данных об категориях с сервера
   Future<void> _fetchCategories(String token) async {
     final response = await http.get(
-      Uri.parse('http://192.168.0.105:3000/api/trainer/muscle-categories'),
+      Uri.parse('https://training-sync.com/api/trainer/muscle-categories'),
       headers: {
         'authorization': token, // Добавляем токен в заголовок
       },
@@ -242,7 +242,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                                     height: 200,
                                     child: FutureBuilder<File>(
                                       future: _loadThumbnail(
-                                        'http://192.168.0.105:3000/api/uploads/videos/exercises/${exercise['videoPath'] ?? ''}',
+                                        'https://training-sync.com/api/uploads/videos/exercises/${exercise['videoPath'] ?? ''}',
                                       ),
                                       builder: (context, snapshot) {
                                         if (snapshot.connectionState ==
@@ -563,7 +563,7 @@ class FillSetDetailsScreen extends StatelessWidget {
         'exerciseIds': setExercisesIds,
       });
       final response = await http.post(
-        Uri.parse('http://192.168.0.105:3000/api/trainer/set'),
+        Uri.parse('https://training-sync.com/api/trainer/set'),
         headers: {'Content-Type': 'application/json', 'authorization': token!},
         body: body,
       );

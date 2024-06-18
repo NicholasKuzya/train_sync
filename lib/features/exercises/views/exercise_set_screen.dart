@@ -28,7 +28,7 @@ class _ExerciseSetScreenState extends State<ExerciseSetScreen> {
     String? token = await TokenManager.getToken();
     if (token != null) {
       final response = await http.get(
-        Uri.parse('http://192.168.0.105:3000/api/trainer/set/${widget.setId}'),
+        Uri.parse('https://training-sync.com/api/trainer/set/${widget.setId}'),
         headers: {
           'authorization': token,
         },
@@ -53,7 +53,7 @@ class _ExerciseSetScreenState extends State<ExerciseSetScreen> {
     String? token = await TokenManager.getToken();
     if (token != null) {
       final response = await http.get(
-        Uri.parse('http://192.168.0.105:3000/api/trainer/exercises'),
+        Uri.parse('https://training-sync.com/api/trainer/exercises'),
         headers: {
           'authorization': token,
         },
@@ -76,7 +76,7 @@ class _ExerciseSetScreenState extends State<ExerciseSetScreen> {
       String? token = await TokenManager.getToken();
       if (token != null) {
         final response = await http.put(
-          Uri.parse('http://192.168.0.105:3000/api/trainer/set/${widget.setId}'),
+          Uri.parse('https://training-sync.com/api/trainer/set/${widget.setId}'),
           headers: {
             'Content-Type': 'application/json',
             'authorization': token,
@@ -110,7 +110,7 @@ class _ExerciseSetScreenState extends State<ExerciseSetScreen> {
     String? token = await TokenManager.getToken();
     if (token != null) {
       final response = await http.delete(
-        Uri.parse('http://192.168.0.105:3000/api/trainer/set/${widget.setId}'),
+        Uri.parse('https://training-sync.com/api/trainer/set/${widget.setId}'),
         headers: {
           'authorization': token,
         },

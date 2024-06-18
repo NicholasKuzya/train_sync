@@ -276,7 +276,7 @@ class VideoViewScreen extends StatelessWidget {
     var body = json.encode({'name': name});
 
     var response = await http.post(
-      Uri.parse('http://192.168.0.105:3000/api/trainer/muscle-categories'),
+      Uri.parse('https://training-sync.com/api/trainer/muscle-categories'),
       headers: headers,
       body: body,
     );
@@ -295,18 +295,20 @@ class VideoViewScreen extends StatelessWidget {
 
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://192.168.0.105:3000/api/trainer/exercises'),
+      Uri.parse('https://training-sync.com/api/trainer/exercises'),
     );
     request.headers.addAll(headers);
 
     request.fields['name'] = name;
     request.fields['description'] = description;
     request.fields['muscleCategoryId'] = categoryId;
-
     request.files.add(await http.MultipartFile.fromPath('video', videoPath));
 
+    print("REQUEST ======================================= $request");
     var streamedResponse = await request.send();
     var response = await http.Response.fromStream(streamedResponse);
+    print("==================================================");
+    print(response.body);
     return json.decode(response.body);
   }
 }

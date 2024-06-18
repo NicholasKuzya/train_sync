@@ -22,7 +22,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
   Future<void> _fetchRequests() async {
     try {
       String? token = await TokenManager.getToken();
-      var url = Uri.parse('http://192.168.0.105:3000/api/trainer/get/requests');
+      var url = Uri.parse('https://training-sync.com/api/trainer/get/requests');
       var response = await http.post(
         url,
         headers: {'authorization': '$token'},
@@ -49,7 +49,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
   Future<void> _acceptOrRejectRequest(String studentId, bool accept) async {
     try {
       String? token = await TokenManager.getToken();
-      var url = Uri.parse('http://192.168.0.105:3000/api/trainer/request/accept');
+      var url = Uri.parse('https://training-sync.com/api/trainer/request/accept');
       var response = await http.post(
         url,
         headers: {'authorization': '$token', 'Content-Type': 'application/json'},
@@ -167,7 +167,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
   Future<Map<String, dynamic>> _fetchStudentData(String studentId) async {
     try {
       String? token = await TokenManager.getToken();
-      var url = Uri.parse('http://192.168.0.105:3000/api/student/get/$studentId');
+      var url = Uri.parse('https://training-sync.com/api/student/get/$studentId');
       var response = await http.post(
         url,
         headers: {'authorization': '$token'},

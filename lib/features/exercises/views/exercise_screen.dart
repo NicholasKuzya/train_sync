@@ -31,7 +31,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
     if (token != null) {
       final response = await http.get(
         Uri.parse(
-            'http://192.168.0.105:3000/api/trainer/exercises/${widget.exerciseId}'),
+            'https://training-sync.com/api/trainer/exercises/${widget.exerciseId}'),
         headers: {
           'authorization': token,
         },
@@ -44,7 +44,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
           _nameController = TextEditingController(text: exercise['name']);
           _descriptionController = TextEditingController(text: exercise['description']);
           _controller = VideoPlayerController.network(
-              'http://192.168.0.105:3000/api/uploads/videos/exercises/${exercise['videoPath']}')
+              'https://training-sync.com/api/uploads/videos/exercises/${exercise['videoPath']}')
             ..initialize().then((_) {
               setState(() {});
             });
@@ -63,7 +63,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
 
       if (token != null) {
         final response = await http.put(
-          Uri.parse('http://192.168.0.105:3000/api/trainer/exercises/${widget.exerciseId}'),
+          Uri.parse('https://training-sync.com/api/trainer/exercises/${widget.exerciseId}'),
           headers: {
             'Content-Type': 'application/json',
             'authorization': token,
@@ -97,7 +97,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
 
     if (token != null) {
       final response = await http.delete(
-        Uri.parse('http://192.168.0.105:3000/api/trainer/exercises/${widget.exerciseId}'),
+        Uri.parse('https://training-sync.com/api/trainer/exercises/${widget.exerciseId}'),
         headers: {
           'authorization': token,
         },

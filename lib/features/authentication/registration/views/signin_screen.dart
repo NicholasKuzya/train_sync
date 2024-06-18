@@ -58,7 +58,7 @@ class _SigninScreenState extends State<SigninScreen> {
 
   Future<void> sendDataToServer() async {
     // URL вашего сервера, куда будет отправлен запрос
-    var url = Uri.parse('http://192.168.0.105:3000/api/${_userType}/register');
+    var url = Uri.parse('https://training-sync.com/api/${_userType}/register');
 
     // Данные, которые вы хотите отправить на сервер
     var data = {
@@ -90,7 +90,7 @@ class _SigninScreenState extends State<SigninScreen> {
     );
     // Декодируем тело ответа в объект Dart
     var responseBody = json.decode(response.body);
-    print(responseBody['success']);
+    print(responseBody);
 
     // Проверяем поле 'success' в теле ответа
     if (responseBody['success']) {
@@ -113,7 +113,7 @@ class _SigninScreenState extends State<SigninScreen> {
   Future<void> confirmEmail(BuildContext context) async {
     // Отправляем запрос на сервер для подтверждения email
     // Используя код подтверждения, введенный пользователем
-    var url = Uri.parse('http://192.168.0.105:3000/api/${_userType}/verify-email');
+    var url = Uri.parse('https://training-sync.com/api/${_userType}/verify-email');
     var data = {
       'email': _emailController.text,
       'code': _confirmationCodeController.text,

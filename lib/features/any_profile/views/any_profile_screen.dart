@@ -34,7 +34,7 @@ class _AnyProfileScreenState extends State<AnyProfileScreen> {
       if (token == null) {
         return {};
       }
-      var url = Uri.parse('http://192.168.0.105:3000/api/$_role/get/${widget.profileId}');
+      var url = Uri.parse('https://training-sync.com/api/$_role/get/${widget.profileId}');
       var response = await http.post(
         url,
         headers: {'authorization': '$token'},

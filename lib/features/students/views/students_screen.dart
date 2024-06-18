@@ -28,7 +28,7 @@ class _StudentScreenState extends State<StudentScreen> {
   Future<void> _fetchStudents() async {
     try {
       String? token = await TokenManager.getToken();
-      var url = Uri.parse('http://192.168.0.105:3000/api/trainer/get/students');
+      var url = Uri.parse('https://training-sync.com/api/trainer/get/students');
       var response = await http.post(
         url,
         headers: {'authorization': '$token'},
@@ -59,7 +59,7 @@ class _StudentScreenState extends State<StudentScreen> {
   Future<void> _fetchRequestsCount() async {
     try {
       String? token = await TokenManager.getToken();
-      var url = Uri.parse('http://192.168.0.105:3000/api/trainer/get/requests');
+      var url = Uri.parse('https://training-sync.com/api/trainer/get/requests');
       var response = await http.post(
         url,
         headers: {'authorization': '$token'},
@@ -168,7 +168,7 @@ class _StudentScreenState extends State<StudentScreen> {
                             // Получаем trainerId
                             var trainerResponse = await http.post(
                               Uri.parse(
-                                  'http://192.168.0.105:3000/api/trainer/get'),
+                                  'https://training-sync.com/api/trainer/get'),
                               headers: {'authorization': '$token'},
                             );
                             var trainerData = json.decode(trainerResponse.body);
@@ -183,7 +183,7 @@ class _StudentScreenState extends State<StudentScreen> {
 
                             var createChatResponse = await http.post(
                               Uri.parse(
-                                  'http://192.168.0.105:3000/api/chat/create'),
+                                  'https://training-sync.com/api/chat/create'),
                               headers: {
                                 'authorization': '$token',
                                 'Content-Type': 'application/json'
