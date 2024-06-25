@@ -347,6 +347,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             },
           ),
         ],
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.popUntil(context, ModalRoute.withName('/'));
+          },
+        ),
       ),
       body: FutureBuilder<Map<String, dynamic>>(
         future: _profileData,

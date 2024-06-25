@@ -48,13 +48,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _checkUserRole() async {
     String? role = await TokenManager.getRole();
     setState(() {
-      if (_role != null) {
-        _role = role!;
-        if (_role == 'student') {
-          _widgetOptions = _widgetOptionsForStudent;
-        } else {
-          _widgetOptions = _widgetOptionsForTrainer;
-        }
+      _role = role ?? '';
+      if (_role == 'student') {
+        _widgetOptions = _widgetOptionsForStudent;
+      } else {
+        _widgetOptions = _widgetOptionsForTrainer;
       }
     });
   }

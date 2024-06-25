@@ -39,6 +39,7 @@ class _SigninScreenState extends State<SigninScreen> {
   bool _emailConfirmationRequired = false;
 
   String _selectedGender = '';
+  String _errorMessage = '';
 
   // Файл изображения аватара
   // File? _avatarFile;
@@ -106,7 +107,9 @@ class _SigninScreenState extends State<SigninScreen> {
       print(responseBody['token']);
     } else {
       // Если произошла ошибка при отправке данных на сервер
-      print('Ошибка отправки данных: ${responseBody['message']}');
+      setState(() {
+        _errorMessage = responseBody['message'];
+      });
     }
   }
 
@@ -432,6 +435,12 @@ class _SigninScreenState extends State<SigninScreen> {
                   ),
                 ),
               ),
+              if (_errorMessage.isNotEmpty)
+                Text(
+                  _errorMessage,
+                  style: TextStyle(color: Colors.red),
+                  textAlign: TextAlign.center,
+                ),
               // Кнопка отправки и логика валидации (перемещена за пределы блока условия)
               ElevatedButton(
                 onPressed: () {

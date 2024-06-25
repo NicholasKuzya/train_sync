@@ -46,6 +46,9 @@ dependencies:
   fluttertoast: any
   url_launcher: ^6.2.6
   google_mobile_ads: ^5.1.0
+  dio: ^5.4.3+1
+  percent_indicator: ^4.2.3
+  provider: ^6.1.2
 
 flutter:
   generate: true

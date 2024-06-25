@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
+import 'package:dio/dio.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
 import '../../../token_manager.dart';
+import 'package:training_sync/upload_manager.dart';
 
 class VideoEditorScreen extends StatefulWidget {
   final String videoPath;
@@ -12,10 +16,10 @@ class VideoEditorScreen extends StatefulWidget {
 
   @override
   _VideoEditorScreenState createState() => _VideoEditorScreenState(
-        muscleCategoryController: TextEditingController(),
-        exerciseNameController: TextEditingController(),
-        exerciseDescriptionController: TextEditingController(),
-      );
+    muscleCategoryController: TextEditingController(),
+    exerciseNameController: TextEditingController(),
+    exerciseDescriptionController: TextEditingController(),
+  );
 }
 
 class _VideoEditorScreenState extends State<VideoEditorScreen> {
@@ -23,7 +27,7 @@ class _VideoEditorScreenState extends State<VideoEditorScreen> {
   late TextEditingController muscleCategoryController;
   late TextEditingController exerciseNameController;
   late TextEditingController exerciseDescriptionController;
-  double _videoPosition = 0.0; // Define _videoPosition here
+  double _videoPosition = 0.0;
 
   _VideoEditorScreenState({
     required this.muscleCategoryController,
@@ -58,64 +62,71 @@ class _VideoEditorScreenState extends State<VideoEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Video Editor'),
-        actions: [
-          IconButton(
-            icon: Icon(
-              _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+    return ChangeNotifierProvider(
+      create: (context) => UploadManager(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Video Editor'),
+          actions: [
+            IconButton(
+              icon: Icon(
+                _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+              ),
+              onPressed: () {
+                setState(() {
+                  if (_controller.value.isPlaying) {
+                    _controller.pause();
+                  } else {
+                    _controller.play();
+                  }
+                });
+              },
             ),
-            onPressed: () {
-              setState(() {
-                if (_controller.value.isPlaying) {
-                  _controller.pause();
-                } else {
-                  _controller.play();
-                }
-              });
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.edit),
-            onPressed: () {
-              _showEditMessage(context);
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.forward),
-            onPressed: () {
-              // Переходим на экран просмотра и отправки видео
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => VideoViewScreen(
-                    videoPath: widget.videoPath,
-                    muscleCategoryController: muscleCategoryController,
-                    exerciseNameController: exerciseNameController,
-                    exerciseDescriptionController:
-                        exerciseDescriptionController,
+            IconButton(
+              icon: Icon(Icons.edit),
+              onPressed: () {
+                _showEditMessage(context);
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.forward),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => VideoViewScreen(
+                      videoPath: widget.videoPath,
+                      muscleCategoryController: muscleCategoryController,
+                      exerciseNameController: exerciseNameController,
+                      exerciseDescriptionController: exerciseDescriptionController,
+                    ),
                   ),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: VideoPlayer(_controller),
-                ),
-                // Здесь находится ваша таймлиния и другие элементы редактора,
-                // которые были удалены или закомментированы.
-              ],
+                );
+              },
             ),
-          ),
-        ],
+          ],
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: Center(
+                child: _controller.value.isInitialized
+                    ? AspectRatio(
+                  aspectRatio: _controller.value.aspectRatio,
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: SizedBox(
+                      width: _controller.value.size.width,
+                      height: _controller.value.size.height,
+                      child: VideoPlayer(_controller),
+                    ),
+                  ),
+                )
+                    : Center(child: CircularProgressIndicator()),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -141,7 +152,7 @@ class _VideoEditorScreenState extends State<VideoEditorScreen> {
   }
 }
 
-class VideoViewScreen extends StatelessWidget {
+class VideoViewScreen extends StatefulWidget {
   final String videoPath;
   final TextEditingController muscleCategoryController;
   final TextEditingController exerciseNameController;
@@ -155,53 +166,76 @@ class VideoViewScreen extends StatelessWidget {
   });
 
   @override
+  _VideoViewScreenState createState() => _VideoViewScreenState();
+}
+
+class _VideoViewScreenState extends State<VideoViewScreen> {
+  @override
   Widget build(BuildContext context) {
+    final uploadManager = Provider.of<UploadManager>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Video settings'),
       ),
       body: SingleChildScrollView(
-        child:Column(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Отображение видео в альбомной форме
             AspectRatio(
-              aspectRatio: 16 / 9, // Примерное соотношение сторон
-              child: VideoPlayer(VideoPlayerController.network(videoPath)),
+              aspectRatio: 16 / 9,
+              child: VideoPlayer(VideoPlayerController.network(widget.videoPath)),
             ),
             SizedBox(height: 20),
-            // Форма для ввода названия, описания и кнопки отправки на сервер
+            if (uploadManager.isUploading)
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  children: [
+                    LinearPercentIndicator(
+                      lineHeight: 8.0,
+                      percent: uploadManager.uploadProgress,
+                      backgroundColor: Colors.grey[200],
+                      progressColor: Colors.blue,
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      '${(uploadManager.uploadProgress * 100).toStringAsFixed(2)}%',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+              ),
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   TextField(
-                    controller: muscleCategoryController,
-                    decoration:
-                    InputDecoration(labelText: 'Muscle category name'),
+                    controller: widget.muscleCategoryController,
+                    decoration: InputDecoration(labelText: 'Muscle category name'),
                   ),
                   SizedBox(height: 10),
                   TextField(
-                    controller: exerciseNameController,
+                    controller: widget.exerciseNameController,
                     decoration: InputDecoration(labelText: 'Name'),
                     maxLines: 2,
                   ),
                   SizedBox(height: 10),
                   TextField(
-                    controller: exerciseDescriptionController,
+                    controller: widget.exerciseDescriptionController,
                     decoration: InputDecoration(labelText: 'Description'),
                     maxLines: 5,
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-                      // Отправка на сервер
                       _sendToServer(
-                        muscleCategoryController.text,
-                        exerciseNameController.text,
-                        exerciseDescriptionController.text,
+                        widget.muscleCategoryController.text,
+                        widget.exerciseNameController.text,
+                        widget.exerciseDescriptionController.text,
                         context,
+                        uploadManager,
                       );
                     },
                     child: Text('Submit'),
@@ -211,41 +245,24 @@ class VideoViewScreen extends StatelessWidget {
             ),
           ],
         ),
-      )
+      ),
     );
   }
 
-  Future<void> _sendToServer(String muscleCategory, String name,
-      String description, BuildContext context) async {
+  Future<void> _sendToServer(
+      String muscleCategory,
+      String name,
+      String description,
+      BuildContext context,
+      UploadManager uploadManager,
+      ) async {
     String? token = await TokenManager.getToken();
     if (token != null) {
-      showDialog(
-        context: context,
-        barrierDismissible: false, // Запрещаем закрытие диалога нажатием за его пределами
-        builder: (BuildContext context) {
-          return Dialog(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CircularProgressIndicator(), // Индикатор загрузки
-                  SizedBox(height: 20),
-                  Text('Uploading...'), // Текст "Загрузка..."
-                ],
-              ),
-            ),
-          );
-        },
-      );
-
-      // Отправляем запрос на создание новой категории мышц
       var categoryResponse = await _createMuscleCategory(token, muscleCategory);
       if (categoryResponse['success']) {
         String categoryId = categoryResponse['muscleCategoryId'];
-        var exerciseResponse = await _createExercise(
-            token, categoryId, name, description, context);
-        Navigator.pop(context); // Закрываем диалог после завершения загрузки
+        var exerciseResponse = await uploadManager.uploadFile(
+            token, widget.videoPath, categoryId, name, description);
         if (exerciseResponse['success']) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Exercise uploaded successfully')),
@@ -257,7 +274,6 @@ class VideoViewScreen extends StatelessWidget {
           );
         }
       } else {
-        Navigator.pop(context); // Закрываем диалог после завершения загрузки
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to create muscle category')),
         );
@@ -269,9 +285,7 @@ class VideoViewScreen extends StatelessWidget {
     }
   }
 
-  // Move this method inside the VideoViewScreen class
-  Future<Map<String, dynamic>> _createMuscleCategory(
-      String token, String name) async {
+  Future<Map<String, dynamic>> _createMuscleCategory(String token, String name) async {
     var headers = {'authorization': token, 'Content-Type': 'application/json'};
     var body = json.encode({'name': name});
 
@@ -281,34 +295,6 @@ class VideoViewScreen extends StatelessWidget {
       body: body,
     );
     print(json.decode(response.body));
-    return json.decode(response.body);
-  }
-
-  Future<Map<String, dynamic>> _createExercise(
-      String token,
-      String categoryId,
-      String name,
-      String description,
-      BuildContext context,
-      ) async {
-    var headers = {'authorization': token};
-
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse('https://training-sync.com/api/trainer/exercises'),
-    );
-    request.headers.addAll(headers);
-
-    request.fields['name'] = name;
-    request.fields['description'] = description;
-    request.fields['muscleCategoryId'] = categoryId;
-    request.files.add(await http.MultipartFile.fromPath('video', videoPath));
-
-    print("REQUEST ======================================= $request");
-    var streamedResponse = await request.send();
-    var response = await http.Response.fromStream(streamedResponse);
-    print("==================================================");
-    print(response.body);
     return json.decode(response.body);
   }
 }

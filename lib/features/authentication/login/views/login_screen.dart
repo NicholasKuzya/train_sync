@@ -4,6 +4,7 @@ import 'dart:convert';
 import '../../../../token_manager.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:training_sync/features/authentication/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key});
@@ -19,7 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _codeController = TextEditingController();
   TextEditingController _newPasswordController = TextEditingController();
-
+  String _errorMessage = '';
   bool _showResetPassword = false;
   bool _showCodeFiled = false;
   bool _showResetBtn = false;
@@ -47,7 +48,9 @@ class _LoginScreenState extends State<LoginScreen> {
       print(token);
       Navigator.pushReplacementNamed(context, '/profile');
     } else {
-      print('Login failed: ${responseData['message']}');
+      setState(() {
+        _errorMessage = responseData['message'];
+      });
     }
   }
 
@@ -60,6 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() {
       _loading = true;
+      _errorMessage = '';
     });
 
     var response = await http.post(
@@ -198,6 +202,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     decoration: InputDecoration(labelText: 'Password'),
                     obscureText: true,
                   ),
+                  if (_errorMessage.isNotEmpty)
+                    Text(
+                      _errorMessage,
+                      style: TextStyle(color: Colors.red),
+                      textAlign: TextAlign.center,
+                    ),
                   SizedBox(height: 16.0),
                   ElevatedButton(
                     onPressed: _login,
